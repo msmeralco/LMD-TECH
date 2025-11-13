@@ -556,6 +556,44 @@ async def get_results(run_id: str):
         raise HTTPException(status_code=500, detail=str(e))
 
 
+@router.get("/filters/{run_id}")
+async def get_filter_options(run_id: str):
+    """
+    Get unique filter values for ranking sidebar.
+    
+    Returns:
+        {
+            "barangays": ["Tondo", "Ermita", ...],
+            "transformers": ["TX_MAIN_001", "TX_MAIN_002", ...],
+            "risk_levels": ["HIGH", "MEDIUM", "LOW"]
+        }
+    """
+    try:
+        results = await get_run_results(run_id)
+        
+        if not results:
+            raise HTTPException(status_code=404, detail="Run not found")
+        
+        meters = results.get("meters", [])
+        
+        # Extract unique values
+        barangays = sorted(list(set(m.get("barangay", "") for m in meters if m.get("barangay"))))
+        transformers = sorted(list(set(m.get("transformer_id", "") for m in meters if m.get("transformer_id"))))
+        risk_levels = ["HIGH", "MEDIUM", "LOW"]
+        
+        return {
+            "barangays": barangays,
+            "transformers": transformers,
+            "risk_levels": risk_levels
+        }
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"❌ Error retrieving filter options: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
 # ==============================================================================
 # EXPORT TO CSV
 # ==============================================================================
@@ -563,17 +601,28 @@ async def get_results(run_id: str):
 @router.get("/export/{run_id}")
 async def export_report(
     run_id: str,
-    level: str = Query("transformer", regex="^(transformer|district|meter)$")
+    level: str = Query("meter", regex="^(transformer|district|meter)$"),
+    barangay: Optional[str] = Query(None, description="Filter by barangay"),
+    transformer: Optional[str] = Query(None, description="Filter by transformer/feeder"),
+    risk_level: Optional[str] = Query(None, regex="^(HIGH|MEDIUM|LOW)$", description="Filter by risk level")
 ):
     """
-    Export analysis results as CSV for field inspections.
+    Export analysis results as CSV for field inspections with optional filters.
     
     Args:
         run_id: Analysis run ID
         level: "transformer", "district" (barangay), or "meter"
+        barangay: Filter by barangay name (optional)
+        transformer: Filter by transformer ID (optional)
+        risk_level: Filter by risk level: HIGH, MEDIUM, or LOW (optional)
     
     Returns:
-        CSV file download
+        Filtered CSV file download
+    
+    Examples:
+        /export/{run_id}?level=meter&barangay=Tondo&risk_level=HIGH
+        /export/{run_id}?level=meter&transformer=TX_MAIN_001
+        /export/{run_id}?level=meter  (all meters, ranked by risk)
     """
     try:
         results = await get_run_results(run_id)
@@ -592,6 +641,35 @@ async def export_report(
             
         elif level == "meter":
             df = pd.DataFrame(results["meters"])
+            
+            # Apply filters
+            if barangay:
+                df = df[df['barangay'] == barangay]
+                logger.info(f"📍 Filtered by barangay: {barangay} ({len(df)} meters)")
+            
+            if transformer:
+                df = df[df['transformer_id'] == transformer]
+                logger.info(f"⚡ Filtered by transformer: {transformer} ({len(df)} meters)")
+            
+            if risk_level:
+                df = df[df['risk_level'] == risk_level]
+                logger.info(f"🎯 Filtered by risk level: {risk_level} ({len(df)} meters)")
+            
+            # Sort by anomaly score (highest risk first)
+            df = df.sort_values('anomaly_score', ascending=False)
+            
+            # Build filename with filters
+            filter_parts = []
+            if barangay:
+                filter_parts.append(barangay.replace(' ', '_'))
+            if transformer:
+                filter_parts.append(transformer)
+            if risk_level:
+                filter_parts.append(risk_level.lower())
+            
+            filter_str = '_'.join(filter_parts) if filter_parts else 'all'
+            filename = f"ghostload_meters_{filter_str}_{run_id}.csv"
+            
             # Select relevant columns for export
             export_cols = [
                 'meter_id', 'transformer_id', 'barangay', 'lat', 'lon',

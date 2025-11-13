@@ -141,18 +141,56 @@ class APIService {
   }
 
   /**
-   * Export results as CSV
+   * Export results as CSV with optional filters
    */
-  async exportCSV(runId: string, level: 'transformer' | 'barangay' | 'meter'): Promise<Blob> {
+  async exportCSV(
+    runId: string, 
+    level: 'transformer' | 'barangay' | 'meter',
+    barangay?: string,
+    transformer?: string,
+    riskLevel?: string
+  ): Promise<void> {
+    const params = new URLSearchParams({ level });
+    
+    if (barangay) params.append('barangay', barangay);
+    if (transformer) params.append('transformer', transformer);
+    if (riskLevel) params.append('risk_level', riskLevel);
+
     const response = await fetch(
-      `${API_BASE_URL}/api/export/${runId}?level=${level}`
+      `${API_BASE_URL}/api/export/${runId}?${params.toString()}`
     );
 
     if (!response.ok) {
       throw new Error('Failed to export CSV');
     }
 
-    return response.blob();
+    // Trigger download
+    const blob = await response.blob();
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `ghostload_export_${runId}.csv`;
+    document.body.appendChild(a);
+    a.click();
+    window.URL.revokeObjectURL(url);
+    document.body.removeChild(a);
+  }
+
+  /**
+   * Get available filter options for a run
+   */
+  async getFilterOptions(runId: string): Promise<{
+    barangays: string[];
+    transformers: string[];
+    risk_levels: string[];
+  }> {
+    const response = await fetch(`${API_BASE_URL}/api/filters/${runId}`);
+
+    if (!response.ok) {
+      throw new Error('Failed to fetch filter options');
+    }
+
+    return response.json();
   }
 
   /**
