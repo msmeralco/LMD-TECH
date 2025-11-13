@@ -59,43 +59,50 @@ const calculateDistance = (
 };
 
 /**
- * Accurate cluster detection with 350m threshold
+ * Detect tight clusters of high-risk meters (5+ within 200m radius)
+ * Returns array of meter IDs that are part of significant clusters
  */
-const hasHighRiskCluster = (
+const getClusteredHighRiskMeters = (
   meters: Meter[],
-  maxDistance: number = 350
-): boolean => {
+  maxDistance: number = 200,
+  minClusterSize: number = 5
+): Set<string> => {
   const highRiskMeters = meters.filter((m) => m.riskLevel === "high");
+  const clusteredMeterIds = new Set<string>();
 
-  if (highRiskMeters.length < 3) {
-    return false;
+  if (highRiskMeters.length < minClusterSize) {
+    return clusteredMeterIds;
   }
 
+  // For each high-risk meter, count neighbors within radius
   for (let i = 0; i < highRiskMeters.length; i++) {
-    const [lat1, lon1] = highRiskMeters[i].position;
-    let nearbyCount = 0;
+    const meter1 = highRiskMeters[i];
+    const [lat1, lon1] = meter1.position;
+    const neighbors: Meter[] = [meter1];
 
     for (let j = 0; j < highRiskMeters.length; j++) {
       if (i === j) continue;
 
-      const [lat2, lon2] = highRiskMeters[j].position;
+      const meter2 = highRiskMeters[j];
+      const [lat2, lon2] = meter2.position;
       const distance = calculateDistance(lat1, lon1, lat2, lon2);
 
       if (distance <= maxDistance) {
-        nearbyCount++;
+        neighbors.push(meter2);
       }
     }
 
-    if (nearbyCount >= 2) {
-      return true;
+    // Only mark as cluster if meets minimum size requirement
+    if (neighbors.length >= minClusterSize) {
+      neighbors.forEach(m => clusteredMeterIds.add(m.id));
     }
   }
 
-  return false;
+  return clusteredMeterIds;
 };
 
 /**
- * Heatmap layer component
+ * Heatmap layer - only shows significant clusters (5+ high-risk meters within 200m)
  */
 const HeatmapLayer: React.FC<{ meters: Meter[] }> = ({ meters }) => {
   const map = useMap();
@@ -110,32 +117,33 @@ const HeatmapLayer: React.FC<{ meters: Meter[] }> = ({ meters }) => {
 
       if (!meters || meters.length === 0) return;
 
-      const highRiskMeters = meters.filter((m) => m.riskLevel === "high");
+      // Get only clustered high-risk meters (5+ within 200m)
+      const clusteredMeterIds = getClusteredHighRiskMeters(meters, 200, 5);
+      const clusteredMeters = meters.filter(m => clusteredMeterIds.has(m.id));
 
-      if (highRiskMeters.length === 0) return;
+      if (clusteredMeters.length === 0) return;
 
-      const heatData = highRiskMeters.map(
+      const heatData = clusteredMeters.map(
         (meter) =>
           [
             meter.position[0],
             meter.position[1],
-            meter.anomalyScore * 0.8, // Scale down intensity for better visualization
+            meter.anomalyScore, // Use full anomaly score for intensity
           ] as [number, number, number]
       );
 
       heatLayer = L.heatLayer(heatData, {
-        radius: 25,
-        blur: 15,
+        radius: 30,
+        blur: 20,
         maxZoom: 17,
-        max: 0.8,
-        minOpacity: 0.3,
+        max: 1.0,
+        minOpacity: 0.4,
         gradient: {
-          0.0: "rgba(0, 0, 255, 0)",
-          0.2: "rgba(0, 255, 255, 0.5)",
-          0.4: "rgba(0, 255, 0, 0.6)",
-          0.6: "rgba(255, 255, 0, 0.7)",
-          0.8: "rgba(255, 128, 0, 0.8)",
-          1.0: "rgba(255, 0, 0, 0.9)",
+          0.0: "rgba(0, 0, 0, 0)",
+          0.3: "rgba(255, 165, 0, 0.3)",
+          0.5: "rgba(255, 100, 0, 0.5)",
+          0.7: "rgba(255, 50, 0, 0.7)",
+          1.0: "rgba(220, 20, 60, 0.85)",
         },
       }).addTo(map);
     };
@@ -255,9 +263,10 @@ const DistrictMapView: React.FC<DistrictMapViewProps> = ({
 
   const showHeatmap = useMemo(() => {
     if (viewLevel !== "city" || !selectedCity) return false;
-    const result = hasHighRiskCluster(currentCityMeters, 350);
+    const clusteredMeters = getClusteredHighRiskMeters(currentCityMeters, 200, 5);
+    const result = clusteredMeters.size >= 5;
     console.log(
-      result ? "✅ Heatmap ON: Cluster detected" : "❌ Heatmap OFF: No cluster"
+      result ? `✅ Heatmap ON: ${clusteredMeters.size} clustered meters (200m radius)` : "❌ Heatmap OFF: No significant cluster"
     );
     return result;
   }, [viewLevel, selectedCity, currentCityMeters]);
@@ -409,8 +418,8 @@ const DistrictMapView: React.FC<DistrictMapViewProps> = ({
           </div>
         </div>
         {viewLevel === "city" && showHeatmap && (
-          <div className="mt-3 pt-3 border-t border-gray-200 text-xs text-orange-600 font-medium">
-            🔥 Heatmap: Cluster detected (350m radius)
+          <div className="mt-3 pt-3 border-t border-gray-200 text-xs text-red-600 font-medium">
+            ● Cluster Detected (200m)
           </div>
         )}
       </div>

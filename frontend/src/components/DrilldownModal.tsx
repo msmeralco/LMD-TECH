@@ -234,7 +234,7 @@ const DrilldownModal: React.FC<DrilldownModalProps> = ({ meter, isOpen, onClose,
               {/* Line Chart */}
               <div className="mb-6 bg-white p-6 rounded-lg border-2 border-gray-200 shadow-sm">
                 <h3 className="text-lg font-bold text-meralco-black mb-4 flex items-center">
-                  📈 12-Month Consumption Trend
+                  12-Month Consumption Trend
                 </h3>
                 {isChartReady ? (
                   <div className="w-full" style={{ height: '300px' }}>
@@ -253,7 +253,7 @@ const DrilldownModal: React.FC<DrilldownModalProps> = ({ meter, isOpen, onClose,
               {/* Bar Chart */}
               <div className="bg-white p-6 rounded-lg border-2 border-gray-200 shadow-sm">
                 <h3 className="text-lg font-bold text-meralco-black mb-4 flex items-center">
-                  📊 Monthly Consumption Comparison
+                  Monthly Consumption Comparison
                 </h3>
                 {isChartReady ? (
                   <div className="w-full" style={{ height: '300px' }}>

@@ -140,7 +140,7 @@ const RankingSidebar: React.FC<RankingSidebarProps> = ({
           {/* Barangay Filter */}
           <div>
             <label className="block text-xs font-semibold text-gray-700 mb-1">
-              📍 Barangay
+              Barangay
             </label>
             <select
               value={selectedBarangay}
@@ -159,7 +159,7 @@ const RankingSidebar: React.FC<RankingSidebarProps> = ({
           {/* Transformer/Feeder Filter */}
           <div>
             <label className="block text-xs font-semibold text-gray-700 mb-1">
-              ⚡ Feeder / Transformer
+              Feeder / Transformer
             </label>
             <select
               value={selectedTransformer}
@@ -178,7 +178,7 @@ const RankingSidebar: React.FC<RankingSidebarProps> = ({
           {/* Risk Level Filter */}
           <div>
             <label className="block text-xs font-semibold text-gray-700 mb-1">
-              🎯 Risk Band
+              Risk Band
             </label>
             <select
               value={selectedRiskLevel}
@@ -290,13 +290,13 @@ const RankingSidebar: React.FC<RankingSidebarProps> = ({
 
                 <div className="space-y-1 text-xs text-gray-600">
                   <div className="flex justify-between">
-                    <span>📍 Barangay:</span>
+                    <span>Barangay:</span>
                     <span className="font-medium text-gray-900">
                       {meter.barangay}
                     </span>
                   </div>
                   <div className="flex justify-between">
-                    <span>⚡ Feeder:</span>
+                    <span>Feeder:</span>
                     <span className="font-medium text-gray-900">
                       {meter.transformerId}
                     </span>
