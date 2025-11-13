@@ -68,13 +68,22 @@ except ImportError:
     )
 
 # Local imports
-from base_model import (
-    BaseAnomalyDetector,
-    ModelConfig,
-    ModelType,
-    ModelMetadata,
-    PredictionResult
-)
+try:
+    from machine_learning.models.base_model import (
+        BaseAnomalyDetector,
+        ModelConfig,
+        ModelType,
+        ModelMetadata,
+        PredictionResult
+    )
+except ImportError:
+    from base_model import (
+        BaseAnomalyDetector,
+        ModelConfig,
+        ModelType,
+        ModelMetadata,
+        PredictionResult
+    )
 
 
 # Configure structured logging

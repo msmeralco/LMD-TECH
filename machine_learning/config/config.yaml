@@ -33,7 +33,7 @@ file_paths:
 model_parameters:
   # IsolationForest for anomaly detection
   isolation_forest:
-    contamination: 0.1        # Expected proportion of anomalies (10%)
+    contamination: 0.12       # Expected proportion of anomalies (12% - realistic theft rate)
     n_estimators: 100         # Number of trees
     max_samples: "auto"       # Samples per tree
     max_features: 1.0         # Features per tree (100%)
@@ -53,8 +53,8 @@ model_parameters:
 # RISK THRESHOLDS
 # =============================================================================
 risk_thresholds:
-  high: 0.8                   # High-risk threshold (composite score)
-  medium: 0.6                 # Medium-risk threshold (composite score)
+  high: 0.65                  # High-risk threshold (lowered from 0.8 for realistic detection)
+  medium: 0.45                # Medium-risk threshold (lowered from 0.6 for realistic detection)
   extreme_low_ratio: 0.2      # Extreme low consumption ratio (<20% of median)
   suspicious_low_ratio: 0.4   # Suspicious low consumption ratio (<40% of median)
   spatial_boost: 0.15         # Risk boost for spatial anomalies

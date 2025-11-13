@@ -35,8 +35,33 @@ from typing import Dict, List, Union, Optional, Any
 from dataclasses import dataclass, field, asdict
 from datetime import datetime
 
+# Add project root to Python path for imports
+current_file = Path(__file__).resolve()
+pipeline_dir = current_file.parent  # .../machine_learning/pipeline/
+ml_dir = pipeline_dir.parent  # .../machine_learning/
+project_root = ml_dir.parent  # .../GhostLoadMapper-IDOL_Hackathon-/
+
+# Add both to sys.path
+for path in [str(project_root), str(ml_dir)]:
+    if path not in sys.path:
+        sys.path.insert(0, path)
+
 import pandas as pd
 import numpy as np
+
+# Import required modules for unpickling the model
+# These imports are needed because the pickled model references them
+try:
+    from machine_learning.models import base_model
+    from machine_learning.models import isolation_forest_model
+    from machine_learning.evaluation import anomaly_scorer
+    from machine_learning.evaluation import risk_assessor
+except ImportError:
+    # Fallback to direct imports
+    import models.base_model as base_model
+    import models.isolation_forest_model as isolation_forest_model
+    import evaluation.anomaly_scorer as anomaly_scorer
+    import evaluation.risk_assessor as risk_assessor
 
 # Setup logging
 logging.basicConfig(
@@ -151,21 +176,53 @@ class InferencePipeline:
             model_path = Path(self.config.model_path)
             
             if not model_path.exists():
-                # Try alternative locations
-                alternative_paths = [
-                    Path("machine_learning/output/latest/trained_model.pkl"),
-                    Path("output/latest/trained_model.pkl"),
-                    Path("trained_model.pkl")
-                ]
+                # Get absolute paths for robust detection
+                current_dir = Path.cwd()
                 
+                # The model is saved at project root: GhostLoadMapper-IDOL_Hackathon-/output/latest/
+                # Find project root by looking for the output directory
+                project_root = None
+                
+                # Check if we can find project root
+                for parent in [current_dir] + list(current_dir.parents):
+                    if (parent / "output" / "latest" / "trained_model.pkl").exists():
+                        project_root = parent
+                        break
+                
+                # Build alternative paths
+                alternative_paths = []
+                
+                if project_root:
+                    alternative_paths.append(project_root / "output" / "latest" / "trained_model.pkl")
+                
+                # Also try relative paths
+                alternative_paths.extend([
+                    Path("../../output/latest/trained_model.pkl"),  # From pipeline/
+                    Path("../output/latest/trained_model.pkl"),     # From machine_learning/
+                    Path("output/latest/trained_model.pkl"),        # From project root
+                ])
+                
+                # Check for most recent run_* directory at project root
+                if project_root and (project_root / "output").exists():
+                    output_dir = project_root / "output"
+                    run_dirs = sorted([d for d in output_dir.glob("run_*") if d.is_dir()], reverse=True)
+                    if run_dirs:
+                        most_recent = run_dirs[0] / "trained_model.pkl"
+                        if most_recent.exists():
+                            alternative_paths.insert(0, most_recent)
+                
+                # Try to find the model
                 for alt_path in alternative_paths:
                     if alt_path.exists():
                         model_path = alt_path
                         break
                 else:
                     raise FileNotFoundError(
-                        f"❌ Model not found! Please train a model first using training_pipeline.py\n"
-                        f"   Searched locations: {self.config.model_path}, {alternative_paths}"
+                        f"❌ Model not found! Please train a model first:\n"
+                        f"   Run: python train.py (from machine_learning directory)\n"
+                        f"   Current directory: {current_dir}\n"
+                        f"   Expected location: <project_root>/output/latest/trained_model.pkl\n"
+                        f"   Searched paths: {[str(p) for p in alternative_paths[:5]]}"
                     )
             
             # Load model
@@ -180,7 +237,7 @@ class InferencePipeline:
             else:
                 self.model = model_data
             
-            logger.info(f"✅ Model loaded from: {model_path}")
+            logger.info(f"✅ Model loaded from: {model_path.absolute()}")
             
         except Exception as e:
             logger.error(f"❌ Error loading model: {e}")
@@ -244,36 +301,26 @@ class InferencePipeline:
         """
         Engineer features (must match training pipeline).
         
-        This creates the same features used during training.
+        This creates the same features used during training by using the FeatureEngineer.
         """
-        # Create new DataFrame for engineered features only
-        features = pd.DataFrame()
+        # Import FeatureEngineer
+        from machine_learning.data.feature_engineer import FeatureEngineer
         
-        # 1. Temporal features (if consumption data available)
-        if 'consumption' in df.columns or any('consumption' in col for col in df.columns):
-            consumption_cols = [col for col in df.columns if 'consumption' in col.lower()]
-            
-            if consumption_cols:
-                # Calculate statistics - exactly matching training
-                features['consumption_mean'] = df[consumption_cols].mean(axis=1)
-                features['consumption_std'] = df[consumption_cols].std(axis=1)
-                features['consumption_max'] = df[consumption_cols].max(axis=1)
-                features['consumption_min'] = df[consumption_cols].min(axis=1)
-                features['consumption_range'] = features['consumption_max'] - features['consumption_min']
-                
-                # Trend
-                features['consumption_trend'] = df[consumption_cols].apply(
-                    lambda x: np.polyfit(range(len(x)), x, 1)[0] if len(x) > 1 else 0,
-                    axis=1
-                )
-                
-                # Variability (coefficient of variation)
-                features['consumption_cv'] = features['consumption_std'] / (features['consumption_mean'] + 1e-6)
+        # Initialize feature engineer
+        engineer = FeatureEngineer()
         
-        # 2. Fill missing values
-        features = features.fillna(0)
+        # Engineer features - this will create the same 23 features as training
+        result = engineer.engineer_features(df=df)
         
-        return features
+        # Extract the feature DataFrame
+        features_df = result.data
+        
+        # Select only numeric features (exclude identifiers)
+        exclude_columns = {'meter_id', 'transformer_id', 'anomaly_flag', 'barangay', 'customer_class'}
+        numeric_cols = features_df.select_dtypes(include=[np.number]).columns.tolist()
+        feature_columns = [col for col in numeric_cols if col not in exclude_columns]
+        
+        return features_df[feature_columns]
     
     def _predict_batch(
         self,
@@ -367,7 +414,7 @@ class InferencePipeline:
 
 def predict_meter_risk(
     meter_id: str,
-    consumption_data: List[float],
+    consumption_data: Union[List[float], Dict[str, float]],
     transformer_id: Optional[str] = None,
     **kwargs
 ) -> Dict[str, Any]:
@@ -378,19 +425,26 @@ def predict_meter_risk(
     
     Args:
         meter_id: Meter identifier
-        consumption_data: List of consumption readings
+        consumption_data: Either:
+            - Dict with monthly_consumption_YYYYMM keys (e.g., {'monthly_consumption_202411': 710.5, ...})
+            - List of 12 monthly consumption values (in order from oldest to newest)
         transformer_id: Optional transformer ID
-        **kwargs: Additional meter attributes
+        **kwargs: Additional meter attributes (e.g., kVA, customer_class, lat, lon)
     
     Returns:
         Dictionary ready for JSON response
     
-    Example (In FastAPI):
-    --------------------
+    Example (In FastAPI with Dict):
+    -------------------------------
     @app.post("/predict")
-    async def predict_risk(meter_id: str, consumption: List[float]):
+    async def predict_risk(meter_id: str, consumption: Dict[str, float]):
         result = predict_meter_risk(meter_id, consumption)
         return result  # Already a dict - perfect for FastAPI!
+    
+    Example (With List):
+    --------------------
+    consumption = [710.5, 811.3, 782.1, ...]  # 12 months
+    result = predict_meter_risk("M12345", consumption)
     
     Example Response:
     ----------------
@@ -414,9 +468,21 @@ def predict_meter_risk(
         **kwargs
     }
     
-    # Add consumption data
-    for i, value in enumerate(consumption_data):
-        meter_data[f'consumption_{i}'] = value
+    # Add consumption data in correct format
+    if isinstance(consumption_data, dict):
+        # Dict already has correct monthly_consumption_YYYYMM keys
+        meter_data.update(consumption_data)
+    elif isinstance(consumption_data, (list, tuple)):
+        # Convert list to monthly_consumption_YYYYMM format
+        # Assuming 12 months starting from 202411 to 202510
+        from datetime import datetime, timedelta
+        start_date = datetime(2024, 11, 1)
+        for i, value in enumerate(consumption_data):
+            current_date = start_date + timedelta(days=30 * i)
+            month_key = f"monthly_consumption_{current_date.strftime('%Y%m')}"
+            meter_data[month_key] = value
+    else:
+        raise TypeError(f"consumption_data must be dict or list, got {type(consumption_data)}")
     
     # Get prediction
     result = predict_meter_risk._pipeline.predict(meter_data)
@@ -470,23 +536,42 @@ if __name__ == "__main__":
     
     # Test 1: Check if model exists
     print("[1/4] Checking for trained model...")
-    model_paths = [
-        Path("output/latest/trained_model.pkl"),
-        Path("machine_learning/output/latest/trained_model.pkl"),
-        Path("trained_model.pkl")
-    ]
     
+    # Get current directory and search for model
+    current_dir = Path.cwd()
+    
+    # Find project root by looking for output directory
     model_found = False
-    for path in model_paths:
-        if path.exists():
-            print(f"    ✅ Found model at: {path}")
+    model_path = None
+    
+    for parent in [current_dir] + list(current_dir.parents):
+        potential_path = parent / "output" / "latest" / "trained_model.pkl"
+        if potential_path.exists():
+            model_path = potential_path
             model_found = True
             break
     
+    # Also try relative paths
     if not model_found:
+        model_paths = [
+            Path("../../output/latest/trained_model.pkl"),
+            Path("../output/latest/trained_model.pkl"),
+            Path("output/latest/trained_model.pkl"),
+        ]
+        
+        for path in model_paths:
+            if path.exists():
+                model_path = path
+                model_found = True
+                break
+    
+    if model_found:
+        print(f"    ✅ Found model at: {model_path.absolute()}")
+    else:
         print("    ❌ No trained model found!")
         print("    📝 ACTION REQUIRED: Train a model first:")
-        print("       Run: python machine_learning/pipeline/training_pipeline.py")
+        print("       Run: python train.py (from machine_learning directory)")
+        print(f"       Current directory: {current_dir}")
         print("\n" + "="*70)
         sys.exit(1)
     
@@ -502,14 +587,28 @@ if __name__ == "__main__":
     # Test 3: Test single prediction
     print("\n[3/4] Testing single meter prediction...")
     try:
+        # Create test data matching the training dataset format
+        # Must have 12 monthly consumption columns (YYYYMM format)
         test_data = {
             'meter_id': 'TEST_001',
-            'consumption_0': 100,
-            'consumption_1': 120,
-            'consumption_2': 115,
-            'consumption_3': 140,
-            'consumption_4': 110,
-            'transformer_id': 'T001'
+            'transformer_id': 'TX_0001',
+            'customer_class': 'commercial',
+            'barangay': 'Poblacion',
+            'lat': 14.4093,
+            'lon': 120.9792,
+            'monthly_consumption_202411': 710.51,
+            'monthly_consumption_202412': 811.28,
+            'monthly_consumption_202501': 663.03,
+            'monthly_consumption_202502': 633.15,
+            'monthly_consumption_202503': 1070.65,
+            'monthly_consumption_202504': 897.33,
+            'monthly_consumption_202505': 996.28,
+            'monthly_consumption_202506': 932.92,
+            'monthly_consumption_202507': 989.90,
+            'monthly_consumption_202508': 945.07,
+            'monthly_consumption_202509': 1037.30,
+            'monthly_consumption_202510': 1023.97,
+            'kVA': 1296.97
         }
         
         result = pipeline.predict(test_data)
@@ -527,10 +626,29 @@ if __name__ == "__main__":
     # Test 4: Test convenience function
     print("\n[4/4] Testing convenience function (for backend)...")
     try:
+        # Test with full dataset format
         result = predict_meter_risk(
             meter_id='TEST_002',
-            consumption_data=[100, 120, 115, 140, 110],
-            transformer_id='T001'
+            consumption_data={
+                'monthly_consumption_202411': 800,
+                'monthly_consumption_202412': 850,
+                'monthly_consumption_202501': 820,
+                'monthly_consumption_202502': 790,
+                'monthly_consumption_202503': 900,
+                'monthly_consumption_202504': 880,
+                'monthly_consumption_202505': 920,
+                'monthly_consumption_202506': 910,
+                'monthly_consumption_202507': 950,
+                'monthly_consumption_202508': 930,
+                'monthly_consumption_202509': 970,
+                'monthly_consumption_202510': 960
+            },
+            transformer_id='TX_0001',
+            customer_class='commercial',
+            barangay='Poblacion',
+            lat=14.409318,
+            lon=120.979165,
+            kVA=1296.97
         )
         print("    ✅ Convenience function works!")
         print(f"    📊 Backend-ready JSON:")

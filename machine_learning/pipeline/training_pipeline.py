@@ -103,7 +103,7 @@ except ImportError as e:
             'model': {
                 'isolation_forest': {
                     'n_estimators': 100,
-                    'contamination': 0.1,
+                    'contamination': 0.12,  # 12% anomaly rate (realistic electricity theft)
                     'random_state': 42
                 }
             },
@@ -602,7 +602,9 @@ class TrainingPipeline:
             random_state = iso_params.random_state if iso_params.random_state is not None else self.config.random_seed
         else:
             # Fallback to defaults
-            contamination = 0.1
+            # contamination=0.12 targets ~12% anomaly detection rate
+            # (realistic for electricity theft: 10-15% industry standard)
+            contamination = 0.12
             n_estimators = 100
             max_samples = 'auto'
             random_state = self.config.random_seed
@@ -808,14 +810,16 @@ class TrainingPipeline:
         else:
             consumption_ratios = np.ones(len(features))
         
+        # Call scorer.score() with correct parameters (no spatial_anomalies)
         composite_scores = scorer.score(
             isolation_scores=predictions['anomaly_score'].values,
-            consumption_ratios=consumption_ratios,
-            spatial_anomalies=np.zeros(len(features))  # Placeholder
+            consumption_ratios=consumption_ratios
         )
         
-        predictions['composite_score'] = composite_scores.composite_score
-        predictions['confidence'] = composite_scores.confidence
+        # Extract composite scores (note: plural 'composite_scores' attribute)
+        predictions['composite_score'] = composite_scores.composite_scores
+        # Use composite scores as confidence (ScoringResult doesn't have a confidence attribute)
+        predictions['confidence'] = composite_scores.composite_scores
         
         # Risk assessment
         if self.yaml_config:
@@ -824,51 +828,74 @@ class TrainingPipeline:
                 'medium': self.yaml_config.risk_thresholds.medium
             }
         else:
-            risk_thresholds = {'high': 0.8, 'medium': 0.6}
+            # Lowered thresholds for realistic risk distribution:
+            # - high: 0.65 (was 0.8) -> ensures ~2-5% high-risk detections
+            # - medium: 0.45 (was 0.6) -> ensures ~5-10% medium-risk
+            risk_thresholds = {'high': 0.65, 'medium': 0.45}
         
-        assessor = RiskAssessor(
-            high_threshold=risk_thresholds['high'],
-            medium_threshold=risk_thresholds['medium']
+        # Import RiskConfig
+        from machine_learning.evaluation.risk_assessor import RiskAssessor, RiskConfig
+        
+        # Create RiskConfig with correct parameter names
+        risk_config = RiskConfig(
+            high_risk_score_threshold=risk_thresholds['high'],
+            medium_risk_score_threshold=risk_thresholds['medium']
         )
+        assessor = RiskAssessor(config=risk_config)
         self.components['risk_assessor'] = assessor
         
-        # Assess risk
-        risk_results = assessor.assess_risk(
+        # Assess risk using the correct method name: assess() not assess_risk()
+        # Pass composite_scores and consumption_ratios (no anomaly_flags parameter)
+        risk_results = assessor.assess(
             composite_scores=predictions['composite_score'].values,
-            anomaly_flags=predictions['anomaly_flag'].values
+            consumption_ratios=consumption_ratios
         )
         
         risk_assessment = predictions.copy()
-        risk_assessment['risk_band'] = risk_results.risk_bands
+        # Extract risk level strings from RiskLevel enums
+        risk_assessment['risk_band'] = [level.value.upper() for level in risk_results.risk_levels]
         risk_assessment['risk_score'] = risk_results.risk_scores
-        risk_assessment['priority'] = risk_results.priorities
+        # Use risk_scores as priority (higher score = higher priority)
+        risk_assessment['priority'] = risk_results.risk_scores
         
         logger.info(f"Risk assessment completed:")
-        logger.info(f"  High risk: {(risk_results.risk_bands == 'HIGH').sum()}")
-        logger.info(f"  Medium risk: {(risk_results.risk_bands == 'MEDIUM').sum()}")
-        logger.info(f"  Low risk: {(risk_results.risk_bands == 'LOW').sum()}")
+        logger.info(f"  High risk: {risk_results.n_high_risk}")
+        logger.info(f"  Medium risk: {risk_results.n_medium_risk}")
+        logger.info(f"  Low risk: {risk_results.n_low_risk}")
         
         # Calculate metrics
         calculator = MetricsCalculator()
         self.components['metrics_calculator'] = calculator
         
-        metrics_result = calculator.calculate_comprehensive_metrics(
+        # Convert risk_levels to lowercase strings for metrics calculator (expects 'high', 'medium', 'low')
+        risk_bands_array = np.array([level.value for level in risk_results.risk_levels])  # Don't uppercase
+        
+        # Use calculate_all_metrics() which returns (ConfidenceMetrics, SuspiciousMetersList)
+        confidence_metrics, suspicious_meters = calculator.calculate_all_metrics(
+            risk_levels=risk_bands_array,
             composite_scores=predictions['composite_score'].values,
-            risk_bands=risk_results.risk_bands,
-            anomaly_flags=predictions['anomaly_flag'].values
+            risk_scores=risk_results.risk_scores,
+            consumption_ratios=consumption_ratios
         )
         
         metrics = {
-            'system_confidence': metrics_result.system_confidence,
-            'detection_rate': metrics_result.detection_rate,
-            'high_risk_rate': metrics_result.high_risk_rate,
-            'top_n_coverage': metrics_result.top_n_coverage,
-            'score_statistics': metrics_result.score_statistics,
+            'system_confidence': confidence_metrics.confidence,
+            'confidence_level': confidence_metrics.confidence_level.value,
+            'detection_rate': predictions['anomaly_flag'].mean(),
+            'high_risk_rate': confidence_metrics.high_risk_rate,
+            'top_n_coverage': len(suspicious_meters) / len(predictions) if len(predictions) > 0 else 0,
+            'score_statistics': {
+                'mean': float(predictions['composite_score'].mean()),
+                'std': float(predictions['composite_score'].std()),
+                'min': float(predictions['composite_score'].min()),
+                'max': float(predictions['composite_score'].max()),
+                'median': float(predictions['composite_score'].median())
+            },
             'total_meters': len(predictions),
             'anomalies_detected': int(predictions['anomaly_flag'].sum()),
-            'high_risk_count': int((risk_results.risk_bands == 'HIGH').sum()),
-            'medium_risk_count': int((risk_results.risk_bands == 'MEDIUM').sum()),
-            'low_risk_count': int((risk_results.risk_bands == 'LOW').sum())
+            'high_risk_count': risk_results.n_high_risk,
+            'medium_risk_count': risk_results.n_medium_risk,
+            'low_risk_count': risk_results.n_low_risk
         }
         
         logger.info(f"System confidence: {metrics['system_confidence']:.3f}")
@@ -947,6 +974,18 @@ class TrainingPipeline:
         with open(timing_path, 'w') as f:
             json.dump(self.stage_times, f, indent=2)
         artifacts['timing'] = timing_path
+        
+        # Create 'latest' symlink/copy for easy inference access
+        latest_dir = self.config.output_dir / "latest"
+        try:
+            # On Windows, copy instead of symlink (requires admin for symlinks)
+            import shutil
+            if latest_dir.exists():
+                shutil.rmtree(latest_dir)
+            shutil.copytree(run_dir, latest_dir)
+            logger.info(f"Created latest model copy at {latest_dir}")
+        except Exception as e:
+            logger.warning(f"Could not create latest directory: {e}")
         
         logger.info(f"All artifacts saved to {run_dir}")
         

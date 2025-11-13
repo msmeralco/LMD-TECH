@@ -1,0 +1,19 @@
+{
+  "system_confidence": 0.74,
+  "confidence_level": "high",
+  "detection_rate": 0.918,
+  "high_risk_rate": 0.052,
+  "top_n_coverage": 0.1,
+  "score_statistics": {
+    "mean": 0.2866318400254546,
+    "std": 0.16089930329812993,
+    "min": 0.09,
+    "max": 0.7899999999999999,
+    "median": 0.23063869264466572
+  },
+  "total_meters": 1000,
+  "anomalies_detected": 918,
+  "high_risk_count": 52,
+  "medium_risk_count": 106,
+  "low_risk_count": 842
+}

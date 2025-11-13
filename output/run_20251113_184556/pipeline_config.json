@@ -1,0 +1,14 @@
+{
+  "config_path": "C:\\Users\\Ken Ira Talingting\\Desktop\\GhostLoadMapper-IDOL_Hackathon-\\machine_learning\\config\\config.yaml",
+  "dataset_dir": "C:\\Users\\Ken Ira Talingting\\Desktop\\GhostLoadMapper-IDOL_Hackathon-\\machine_learning\\datasets\\development",
+  "output_dir": "C:\\Users\\Ken Ira Talingting\\Desktop\\GhostLoadMapper-IDOL_Hackathon-\\output",
+  "enable_preprocessing": true,
+  "enable_feature_engineering": true,
+  "enable_training": true,
+  "enable_evaluation": true,
+  "enable_checkpointing": true,
+  "enable_validation": true,
+  "max_execution_time": 300,
+  "random_seed": 42,
+  "verbose": 1
+}
