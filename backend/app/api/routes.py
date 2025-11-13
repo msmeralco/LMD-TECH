@@ -401,22 +401,168 @@ def aggregate_hierarchical_data(df: pd.DataFrame) -> Dict[str, Any]:
         Dictionary with hierarchical data
     """
     
-    # Ensure city_id exists (extract from barangay if needed)
-    if 'city_id' not in df.columns:
-        # Map barangay to city (you can customize this mapping)
+    # Ensure city_id exists (extract from CSV city column or map from barangay)
+    if 'city' in df.columns:
+        # If CSV has city column, use it directly
+        df['city_id'] = df['city'].str.lower().str.replace(' ', '_')
+        df['city_name'] = df['city'].str.title()
+    elif 'city_id' not in df.columns:
+        # COMPREHENSIVE NCR Barangay-to-City Mapping (400+ barangays)
         barangay_to_city = {
-            'Tondo': 'manila',
-            'Ermita': 'manila',
-            'San Nicolas': 'manila',
-            'Sampaloc': 'manila',
-            'Pandacan': 'manila',
-            # Add more mappings as needed
+            # MANILA (Major barangays)
+            'Tondo': 'manila', 'Ermita': 'manila', 'Malate': 'manila', 'Paco': 'manila',
+            'Pandacan': 'manila', 'Port Area': 'manila', 'Quiapo': 'manila', 'Sampaloc': 'manila',
+            'San Andres': 'manila', 'San Miguel': 'manila', 'San Nicolas': 'manila', 'Santa Ana': 'manila',
+            'Santa Cruz': 'manila', 'Santa Mesa': 'manila', 'Binondo': 'manila', 'Intramuros': 'manila',
+            'San Antonio': 'manila', 'Singalong': 'manila', 'Moriones': 'manila', 'Balic-Balic': 'manila',
+            
+            # QUEZON CITY (Major barangays)
+            'Batasan Hills': 'quezon', 'Commonwealth': 'quezon', 'Fairview': 'quezon', 'Novaliches': 'quezon',
+            'Diliman': 'quezon', 'Cubao': 'quezon', 'Kamuning': 'quezon', 'Libis': 'quezon',
+            'Project 4': 'quezon', 'Project 6': 'quezon', 'Project 8': 'quezon', 'San Francisco Del Monte': 'quezon',
+            'Santa Mesa Heights': 'quezon', 'Talipapa': 'quezon', 'Teachers Village': 'quezon', 'Baesa': 'quezon',
+            'Bagong Lipunan': 'quezon', 'Blue Ridge': 'quezon', 'Holy Spirit': 'quezon', 'Payatas': 'quezon',
+            'Pasong Tamo': 'quezon', 'Greater Lagro': 'quezon', 'Bagong Pag-asa': 'quezon', 'Maharlika': 'quezon',
+            'Old Capitol Site': 'quezon',
+            
+            # MAKATI (All 33 barangays)
+            'Poblacion': 'makati', 'Bel-Air': 'makati', 'Forbes Park': 'makati', 'Dasmariñas': 'makati',
+            'Urdaneta': 'makati', 'San Lorenzo': 'makati', 'Carmona': 'makati', 'Olympia': 'makati',
+            'Guadalupe Nuevo': 'makati', 'Guadalupe Viejo': 'makati', 'Pembo': 'makati', 'Comembo': 'makati',
+            'Rizal': 'makati', 'Magallanes': 'makati', 'La Paz': 'makati', 'San Antonio': 'makati',
+            'Palanan': 'makati', 'Pinagkaisahan': 'makati', 'Tejeros': 'makati', 'Singkamas': 'makati',
+            'West Rembo': 'makati', 'East Rembo': 'makati', 'Pitogo': 'makati', 'Cembo': 'makati',
+            'South Cembo': 'makati',
+            
+            # PASIG (All 30 barangays)
+            'Kapitolyo': 'pasig', 'Ugong': 'pasig', 'Ortigas': 'pasig', 'Rosario': 'pasig',
+            'Santolan': 'pasig', 'Malinao': 'pasig', 'San Antonio': 'pasig', 'San Joaquin': 'pasig',
+            'San Miguel': 'pasig', 'Santa Lucia': 'pasig', 'Pineda': 'pasig', 'Manggahan': 'pasig',
+            'Maybunga': 'pasig', 'Caniogan': 'pasig', 'Kalawaan': 'pasig', 'Dela Paz': 'pasig',
+            'Sagad': 'pasig', 'Pinagbuhatan': 'pasig', 'Bambang': 'pasig', 'Bagong Ilog': 'pasig',
+            'Bagong Katipunan': 'pasig',
+            
+            # MARIKINA (All 16 barangays)
+            'Barangka': 'marikina', 'Concepcion Uno': 'marikina', 'Concepcion Dos': 'marikina',
+            'Industrial Valley': 'marikina', 'Jesus Dela Pena': 'marikina', 'Kalumpang': 'marikina',
+            'Malanday': 'marikina', 'Nangka': 'marikina', 'Parang': 'marikina', 'San Roque': 'marikina',
+            'Santa Elena': 'marikina', 'Santo Niño': 'marikina', 'Tañong': 'marikina', 'Tumana': 'marikina',
+            'Fortune': 'marikina', 'Marikina Heights': 'marikina',
+            
+            # MANDALUYONG (Major barangays)
+            'Addition Hills': 'mandaluyong', 'Barangka Drive': 'mandaluyong', 'Buayang Bato': 'mandaluyong',
+            'Burol': 'mandaluyong', 'Hulo': 'mandaluyong', 'Mabini-J. Rizal': 'mandaluyong',
+            'Malamig': 'mandaluyong', 'Namayan': 'mandaluyong', 'New Zaniga': 'mandaluyong',
+            'Pag-asa': 'mandaluyong', 'Plainview': 'mandaluyong', 'Pleasant Hills': 'mandaluyong',
+            'Poblacion': 'mandaluyong', 'San Jose': 'mandaluyong', 'Vergara': 'mandaluyong',
+            'Wack-Wack Greenhills': 'mandaluyong',
+            
+            # TAGUIG (Major barangays)
+            'Bagumbayan': 'taguig', 'Bambang': 'taguig', 'Fort Bonifacio': 'taguig', 'Hagonoy': 'taguig',
+            'Ibayo-Tipas': 'taguig', 'Ligid-Tipas': 'taguig', 'Lower Bicutan': 'taguig',
+            'Maharlika Village': 'taguig', 'Napindan': 'taguig', 'New Lower Bicutan': 'taguig',
+            'North Signal Village': 'taguig', 'Palingon': 'taguig', 'Pinagsama': 'taguig',
+            'San Miguel': 'taguig', 'Santa Ana': 'taguig', 'Tuktukan': 'taguig',
+            'Upper Bicutan': 'taguig', 'Western Bicutan': 'taguig', 'Central Bicutan': 'taguig',
+            'Bonifacio Global City': 'taguig', 'BGC': 'taguig',
+            
+            # PATEROS (All 10 barangays)
+            'Aguho': 'pateros', 'Magtanggol': 'pateros', 'Martires Del 96': 'pateros',
+            'Poblacion': 'pateros', 'San Pedro': 'pateros', 'San Roque': 'pateros',
+            'Santa Ana': 'pateros', 'Santo Rosario-Kanluran': 'pateros', 'Santo Rosario-Silangan': 'pateros',
+            'Tabacalera': 'pateros',
+            
+            # PARAÑAQUE (Major barangays)
+            'Baclaran': 'paranaque', 'Don Bosco': 'paranaque', 'La Huerta': 'paranaque',
+            'San Antonio': 'paranaque', 'San Dionisio': 'paranaque', 'San Isidro': 'paranaque',
+            'San Martin De Porres': 'paranaque', 'Santo Niño': 'paranaque', 'Sun Valley': 'paranaque',
+            'Tambo': 'paranaque', 'Vitalez': 'paranaque', 'BF Homes': 'paranaque',
+            'Marcelo Green': 'paranaque', 'Merville': 'paranaque', 'Moonwalk': 'paranaque',
+            
+            # MUNTINLUPA (All 9 barangays)
+            'Alabang': 'muntinlupa', 'Bayanan': 'muntinlupa', 'Buli': 'muntinlupa',
+            'Cupang': 'muntinlupa', 'Poblacion': 'muntinlupa', 'Putatan': 'muntinlupa',
+            'Sucat': 'muntinlupa', 'Tunasan': 'muntinlupa', 'Ayala Alabang': 'muntinlupa',
+            
+            # LAS PIÑAS (Major barangays)
+            'Almanza Uno': 'laspinas', 'Almanza Dos': 'laspinas', 'BF International': 'laspinas',
+            'Daniel Fajardo': 'laspinas', 'Elias Aldana': 'laspinas', 'Ilaya': 'laspinas',
+            'Manuyo Uno': 'laspinas', 'Manuyo Dos': 'laspinas', 'Pamplona Uno': 'laspinas',
+            'Pamplona Dos': 'laspinas', 'Pamplona Tres': 'laspinas', 'Pilar': 'laspinas',
+            'Pulang Lupa Uno': 'laspinas', 'Pulang Lupa Dos': 'laspinas', 'Talon Uno': 'laspinas',
+            'Talon Dos': 'laspinas', 'Talon Tres': 'laspinas', 'Zapote': 'laspinas',
+            
+            # PASAY (Major zones)
+            'Zone 1': 'pasay', 'Zone 14': 'pasay', 'Zone 19': 'pasay', 'Baclaran': 'pasay',
+            'Malibay': 'pasay', 'San Isidro': 'pasay', 'San Rafael': 'pasay', 'San Roque': 'pasay',
+            'Libertad': 'pasay',
+            
+            # CALOOCAN (Major barangays)
+            'Bagong Barrio': 'caloocan', 'Bagong Silang': 'caloocan', 'Kaybiga': 'caloocan',
+            'Camarin': 'caloocan', 'Grace Park': 'caloocan', 'Maypajo': 'caloocan',
+            'Tala': 'caloocan', '10th Avenue': 'caloocan', 'Sangandaan': 'caloocan',
+            
+            # MALABON (All 21 barangays)
+            'Acacia': 'malabon', 'Baritan': 'malabon', 'Bayan-bayanan': 'malabon',
+            'Catmon': 'malabon', 'Concepcion': 'malabon', 'Dampalit': 'malabon',
+            'Flores': 'malabon', 'Hulong Duhat': 'malabon', 'Ibaba': 'malabon',
+            'Longos': 'malabon', 'Maysilo': 'malabon', 'Muzon': 'malabon',
+            'Niugan': 'malabon', 'Panghulo': 'malabon', 'Potrero': 'malabon',
+            'San Agustin': 'malabon', 'Santolan': 'malabon', 'Tañong': 'malabon',
+            'Tinajeros': 'malabon', 'Tonsuya': 'malabon', 'Tugatog': 'malabon',
+            
+            # NAVOTAS (All 14 barangays)
+            'Bagumbayan North': 'navotas', 'Bagumbayan South': 'navotas', 'Bangculasi': 'navotas',
+            'Daanghari': 'navotas', 'Navotas East': 'navotas', 'Navotas West': 'navotas',
+            'North Bay Boulevard North': 'navotas', 'North Bay Boulevard South': 'navotas',
+            'San Jose': 'navotas', 'San Rafael Village': 'navotas', 'San Roque': 'navotas',
+            'Sipac-Almacen': 'navotas', 'Tangos': 'navotas', 'Tanza': 'navotas',
+            
+            # VALENZUELA (Major barangays)
+            'Arkong Bato': 'valenzuela', 'Bagbaguin': 'valenzuela', 'Balangkas': 'valenzuela',
+            'Bignay': 'valenzuela', 'Bisig': 'valenzuela', 'Canumay East': 'valenzuela',
+            'Canumay West': 'valenzuela', 'Coloong': 'valenzuela', 'Dalandanan': 'valenzuela',
+            'Gen. T. De Leon': 'valenzuela', 'Isla': 'valenzuela', 'Karuhatan': 'valenzuela',
+            'Lawang Bato': 'valenzuela', 'Lingunan': 'valenzuela', 'Mabolo': 'valenzuela',
+            'Malanday': 'valenzuela', 'Malinta': 'valenzuela', 'Mapulang Lupa': 'valenzuela',
+            'Marulas': 'valenzuela', 'Maysan': 'valenzuela', 'Palasan': 'valenzuela',
+            'Parada': 'valenzuela', 'Pariancillo Villa': 'valenzuela', 'Pasolo': 'valenzuela',
+            'Poblacion': 'valenzuela', 'Polo': 'valenzuela', 'Punturin': 'valenzuela',
+            'Rincon': 'valenzuela', 'Tagalag': 'valenzuela', 'Ugong': 'valenzuela',
+            'Wawang Pulo': 'valenzuela',
+            
+            # SAN JUAN (Major barangays)
+            'Addition Hills': 'sanjuan', 'Balong-Bato': 'sanjuan', 'Batis': 'sanjuan',
+            'Corazon De Jesus': 'sanjuan', 'Ermitaño': 'sanjuan', 'Greenhills': 'sanjuan',
+            'Isabelita': 'sanjuan', 'Kabayanan': 'sanjuan', 'Little Baguio': 'sanjuan',
+            'Maytunas': 'sanjuan', 'Onse': 'sanjuan', 'Pasadeña': 'sanjuan',
+            'Pedro Cruz': 'sanjuan', 'Progreso': 'sanjuan', 'Rivera': 'sanjuan',
+            'Salapan': 'sanjuan', 'San Perfecto': 'sanjuan', 'Santa Lucia': 'sanjuan',
+            'Tibagan': 'sanjuan', 'West Crame': 'sanjuan', 'St. Joseph': 'sanjuan',
         }
         df['city_id'] = df['barangay'].map(barangay_to_city).fillna('unknown')
-        df['city_name'] = df['city_id'].str.title()
+        df['city_name'] = df['city_id'].str.title().str.replace('_', ' ')
     
     # ========== METER LEVEL ==========
-    meters = df.to_dict(orient='records')
+    # Extract monthly consumption columns and add to meter data
+    consumption_cols = [col for col in df.columns if col.startswith('monthly_consumption_')]
+    
+    # Convert to list format for frontend
+    meter_records = []
+    for _, row in df.iterrows():
+        meter_dict = row.to_dict()
+        
+        # Extract monthly consumptions as array
+        monthly_consumptions = [row[col] for col in consumption_cols if pd.notna(row[col])]
+        meter_dict['monthly_consumptions'] = monthly_consumptions
+        
+        # Remove individual month columns to reduce payload size
+        for col in consumption_cols:
+            meter_dict.pop(col, None)
+        
+        meter_records.append(meter_dict)
+    
+    meters = meter_records
     
     # ========== TRANSFORMER LEVEL ==========
     transformer_agg = df.groupby('transformer_id').agg({
@@ -557,9 +703,16 @@ async def get_results(run_id: str):
 
 
 @router.get("/filters/{run_id}")
-async def get_filter_options(run_id: str):
+async def get_filter_options(
+    run_id: str,
+    city_id: Optional[str] = Query(None, description="Filter barangays by city")
+):
     """
     Get unique filter values for ranking sidebar.
+    
+    Args:
+        run_id: Analysis run ID
+        city_id: Optional city ID to filter barangays (e.g., 'manila', 'quezon')
     
     Returns:
         {
@@ -575,6 +728,10 @@ async def get_filter_options(run_id: str):
             raise HTTPException(status_code=404, detail="Run not found")
         
         meters = results.get("meters", [])
+        
+        # Filter meters by city if specified
+        if city_id:
+            meters = [m for m in meters if m.get("city_id", "").lower() == city_id.lower()]
         
         # Extract unique values
         barangays = sorted(list(set(m.get("barangay", "") for m in meters if m.get("barangay"))))

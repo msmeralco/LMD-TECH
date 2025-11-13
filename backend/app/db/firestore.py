@@ -39,14 +39,13 @@ db = firestore.client()
 
 async def save_run_results(run_id: str, results: Dict[str, Any]) -> Dict[str, Any]:
     """
-    Save complete ML pipeline results to Firestore.
+    Save complete ML pipeline results to Firestore with chunking for large datasets.
     
     This stores:
-    - City aggregations (for city-level zoom)
-    - Barangay aggregations (for barangay-level zoom)
-    - Transformer data (for transformer markers)
-    - Meter predictions (for meter-level details)
-    - High-risk summary (for sidebar alerts)
+    - Summary document: cities, barangays, transformers, metadata
+    - Meter batches: Split meters into 500-item chunks in subcollection
+    
+    Firestore has 1MB document limit, so for 3K+ meters we split into batches.
     
     Args:
         run_id: Unique identifier for this analysis run
@@ -58,8 +57,12 @@ async def save_run_results(run_id: str, results: Dict[str, Any]) -> Dict[str, An
     try:
         doc_ref = db.collection("runs").document(run_id)
         
-        # Prepare document data
-        doc_data = {
+        # Extract meters for chunking
+        meters = results.get("meters", [])
+        total_meters = len(meters)
+        
+        # Prepare summary document (without meters)
+        summary_data = {
             "run_id": run_id,
             "timestamp": firestore.SERVER_TIMESTAMP,
             "status": "completed",
@@ -69,28 +72,53 @@ async def save_run_results(run_id: str, results: Dict[str, Any]) -> Dict[str, An
             "total_cities": results.get("total_cities", 0),
             "high_risk_count": results.get("high_risk_count", 0),
             
-            # Hierarchical data for frontend
+            # Hierarchical data (cities, barangays, transformers are small)
             "cities": results.get("cities", []),
             "barangays": results.get("barangays", []),
             "transformers": results.get("transformers", []),
-            "meters": results.get("meters", []),
             "high_risk_summary": results.get("high_risk_summary", {}),
             
             # Metadata
             "processing_time_seconds": results.get("processing_time", 0),
             "model_version": results.get("model_version", "1.0"),
+            "meter_batches": 0,  # Will update below
         }
         
-        # Save to Firestore
-        doc_ref.set(doc_data)
+        # Save summary document first
+        doc_ref.set(summary_data)
+        logger.info(f"✅ Saved summary for run {run_id}")
         
-        logger.info(f"✅ Saved results for run {run_id} ({results.get('total_meters', 0)} meters)")
+        # Save meters in batches (500 meters per batch = ~200KB each)
+        BATCH_SIZE = 500
+        batch_count = 0
+        
+        for i in range(0, total_meters, BATCH_SIZE):
+            batch_meters = meters[i:i + BATCH_SIZE]
+            batch_num = i // BATCH_SIZE
+            
+            # Save to subcollection
+            batch_ref = doc_ref.collection("meter_batches").document(f"batch_{batch_num}")
+            batch_ref.set({
+                "batch_number": batch_num,
+                "meters": batch_meters,
+                "count": len(batch_meters),
+                "timestamp": firestore.SERVER_TIMESTAMP,
+            })
+            
+            batch_count += 1
+            logger.info(f"  ✅ Saved batch {batch_num} ({len(batch_meters)} meters)")
+        
+        # Update summary with batch count
+        doc_ref.update({"meter_batches": batch_count})
+        
+        logger.info(f"✅ Saved complete results for run {run_id} ({total_meters} meters in {batch_count} batches)")
         
         return {
             "run_id": run_id,
             "status": "saved",
-            "total_meters": results.get("total_meters", 0),
+            "total_meters": total_meters,
             "total_transformers": results.get("total_transformers", 0),
+            "batch_count": batch_count,
         }
         
     except Exception as e:
@@ -101,6 +129,7 @@ async def save_run_results(run_id: str, results: Dict[str, Any]) -> Dict[str, An
 async def get_run_results(run_id: str) -> Optional[Dict[str, Any]]:
     """
     Retrieve complete analysis results for a specific run.
+    Fetches summary + all meter batches and merges them.
     
     Args:
         run_id: The analysis run ID
@@ -109,15 +138,39 @@ async def get_run_results(run_id: str) -> Optional[Dict[str, Any]]:
         Dictionary with all results or None if not found
     """
     try:
+        # Get summary document
         doc = db.collection("runs").document(run_id).get()
         
-        if doc.exists:
-            data = doc.to_dict()
-            logger.info(f"✅ Retrieved results for run {run_id}")
-            return data
-        else:
+        if not doc.exists:
             logger.warning(f"⚠️ Run {run_id} not found")
             return None
+        
+        data = doc.to_dict()
+        meter_batches_count = data.get("meter_batches", 0)
+        
+        # If there are meter batches, fetch and merge them
+        if meter_batches_count > 0:
+            logger.info(f"📦 Fetching {meter_batches_count} meter batches...")
+            all_meters = []
+            
+            # Fetch all batches
+            batches_ref = db.collection("runs").document(run_id).collection("meter_batches")
+            batches = batches_ref.order_by("batch_number").stream()
+            
+            for batch_doc in batches:
+                batch_data = batch_doc.to_dict()
+                batch_meters = batch_data.get("meters", [])
+                all_meters.extend(batch_meters)
+                logger.info(f"  ✅ Loaded batch {batch_data.get('batch_number')} ({len(batch_meters)} meters)")
+            
+            # Add meters to data
+            data["meters"] = all_meters
+            logger.info(f"✅ Retrieved results for run {run_id} ({len(all_meters)} total meters)")
+        else:
+            # Old format or no meters
+            logger.info(f"✅ Retrieved results for run {run_id} (legacy format)")
+        
+        return data
             
     except Exception as e:
         logger.error(f"❌ Error retrieving run results: {e}")
