@@ -1,0 +1,36 @@
+================================================================================
+MANILA CLUSTERED DATASET
+================================================================================
+
+Generated: 2025-11-14 05:14:56
+
+Total Meters: 1000
+Unique Barangays: 20
+Unique Transformers: 100
+
+Customer Class Distribution:
+customer_class
+Residential    725
+Commercial     223
+Industrial      52
+
+Top 10 Barangays by Meter Count:
+barangay
+Tondo          50
+Ermita         50
+Moriones       50
+Singalong      50
+San Antonio    50
+Intramuros     50
+Binondo        50
+Santa Mesa     50
+Santa Cruz     50
+Santa Ana      50
+
+Geographic Bounds:
+  Latitude: 14.560613 to 14.624334
+  Longitude: 120.960535 to 121.021587
+
+Files:
+  - meter_consumption.csv
+  - dataset_info.txt

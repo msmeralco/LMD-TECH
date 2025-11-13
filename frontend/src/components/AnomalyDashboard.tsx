@@ -5,6 +5,7 @@ import DrilldownModal from "./DrilldownModal";
 import UploadModal from "./UploadModal";
 import FloatingNavbar from "./FloatingNavbar";
 import RankingSidebar from "./RankingSidebar";
+import StatsPanel from "./StatsPanel";
 import { apiService, ResultsData, Meter as APIMeter } from "../services/api";
 import { Meter } from "../data/types";
 import { BARANGAY_TO_CITY, CITY_METADATA } from "../data/cityMetadata";
@@ -140,7 +141,7 @@ const AnomalyDashboard: React.FC = () => {
       const barangay = apiMeter.barangay?.trim();
 
       if (barangay && BARANGAY_TO_CITY[barangay]) {
-        cityId = BARANGAY_TO_CITY[barangay];
+        cityId = BARANGAY_TO_CITY[barangay].city;
         console.log(`🗺️ Mapped barangay "${barangay}" → city "${cityId}"`);
       } else if (apiMeter.lat && apiMeter.lon) {
         // CRITICAL: If barangay not in mapping, use GPS (don't leave as 'unknown')
@@ -196,6 +197,7 @@ const AnomalyDashboard: React.FC = () => {
       meterNumber: apiMeter.meter_id,
       transformerId: apiMeter.transformer_id,
       barangay: apiMeter.barangay,
+      barangay_id: apiMeter.barangay_id, // ✅ Pass through barangay_id from backend
       city_id: cityId, // ✅ ULTRA-SMART: GPS-corrected city detection
       feeder: apiMeter.transformer_id,
       riskLevel: riskLevel,
@@ -349,13 +351,18 @@ const AnomalyDashboard: React.FC = () => {
         {/* Map View - Always visible */}
         <div className="flex-1">
           {resultsData ? (
-            <DistrictMapView
-              districts={getDistricts()}
-              onDistrictClick={handleDistrictClick}
-              selectedDistrict={selectedDistrict}
-              meters={getMeters()}
-              onMeterClick={handleMeterClick}
-            />
+            <>
+              {/* Stats Panel - Show data summary */}
+              <StatsPanel resultsData={resultsData} />
+              
+              <DistrictMapView
+                districts={getDistricts()}
+                onDistrictClick={handleDistrictClick}
+                selectedDistrict={selectedDistrict}
+                meters={getMeters()}
+                onMeterClick={handleMeterClick}
+              />
+            </>
           ) : (
             // Empty state map with instruction
             <div className="h-full w-full flex items-center justify-center bg-gradient-to-br from-gray-50 to-gray-100">

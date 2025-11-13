@@ -1,0 +1,36 @@
+================================================================================
+METRO MANILA REALISTIC DATASET
+================================================================================
+
+Generated: 2025-11-14 05:14:57
+
+Total Meters: 3000
+Unique Barangays: 310
+Unique Transformers: 1924
+
+Customer Class Distribution:
+customer_class
+Residential    2257
+Commercial      594
+Industrial      149
+
+Top 10 Barangays by Meter Count:
+barangay
+Pinagsama               20
+Tondo                   10
+Taguig Santa Ana        10
+Ibayo-Tipas             10
+Ligid-Tipas             10
+Lower Bicutan           10
+Maharlika Village       10
+Napindan                10
+New Lower Bicutan       10
+North Signal Village    10
+
+Geographic Bounds:
+  Latitude: 14.361611 to 14.753925
+  Longitude: 120.925391 to 121.136405
+
+Files:
+  - meter_consumption.csv
+  - dataset_info.txt

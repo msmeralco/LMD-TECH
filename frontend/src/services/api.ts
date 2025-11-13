@@ -17,6 +17,8 @@ export interface ResultsData {
   status: string;
   total_meters: number;
   total_transformers: number;
+  total_barangays: number;
+  total_cities: number;
   high_risk_count: number;
   cities: City[];
   barangays: Barangay[];
@@ -37,6 +39,7 @@ export interface City {
 
 export interface Barangay {
   barangay: string;
+  barangay_id: number; // Unique ID to handle duplicate barangay names
   city_id: string;
   lat: number;
   lon: number;
@@ -48,6 +51,7 @@ export interface Barangay {
 export interface Transformer {
   transformer_id: string;
   barangay: string;
+  barangay_id?: number; // Optional for backward compatibility
   city_id: string;
   lat: number;
   lon: number;
@@ -64,6 +68,7 @@ export interface Meter {
   meter_id: string;
   transformer_id: string;
   barangay: string;
+  barangay_id?: number; // Optional for backward compatibility
   city_id: string;
   lat: number;
   lon: number;

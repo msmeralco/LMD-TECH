@@ -71,6 +71,86 @@ router = APIRouter(prefix="/api", tags=["main"])
 # Initialize ML pipeline (singleton)
 ml_pipeline = None
 
+
+# ==============================================================================
+# BARANGAY ID MAPPING - Matches frontend cityMetadata.ts
+# ==============================================================================
+
+# ID to barangay/city mapping (CSV contains barangay_id)
+# This matches the frontend BARANGAY_TO_CITY structure
+BARANGAY_ID_MAP = {
+    # MANILA
+    1: {'city': 'manila', 'barangay': 'Tondo'},
+    2: {'city': 'manila', 'barangay': 'Ermita'},
+    3: {'city': 'manila', 'barangay': 'Malate'},
+    4: {'city': 'manila', 'barangay': 'Paco'},
+    5: {'city': 'manila', 'barangay': 'Pandacan'},
+    6: {'city': 'manila', 'barangay': 'Port Area'},
+    7: {'city': 'manila', 'barangay': 'Quiapo'},
+    8: {'city': 'manila', 'barangay': 'Sampaloc'},
+    9: {'city': 'manila', 'barangay': 'San Andres'},
+    10: {'city': 'manila', 'barangay': 'San Miguel'},
+    11: {'city': 'manila', 'barangay': 'San Nicolas'},
+    12: {'city': 'manila', 'barangay': 'Santa Ana'},
+    13: {'city': 'manila', 'barangay': 'Santa Cruz'},
+    14: {'city': 'manila', 'barangay': 'Santa Mesa'},
+    15: {'city': 'manila', 'barangay': 'Binondo'},
+    16: {'city': 'manila', 'barangay': 'Intramuros'},
+    17: {'city': 'manila', 'barangay': 'San Antonio'},
+    18: {'city': 'manila', 'barangay': 'Singalong'},
+    19: {'city': 'manila', 'barangay': 'Moriones'},
+    20: {'city': 'manila', 'barangay': 'Balic-Balic'},
+    
+    # QUEZON CITY
+    21: {'city': 'quezon', 'barangay': 'Batasan Hills'},
+    22: {'city': 'quezon', 'barangay': 'Commonwealth'},
+    23: {'city': 'quezon', 'barangay': 'Fairview'},
+    24: {'city': 'quezon', 'barangay': 'Novaliches'},
+    25: {'city': 'quezon', 'barangay': 'Diliman'},
+    26: {'city': 'quezon', 'barangay': 'Cubao'},
+    27: {'city': 'quezon', 'barangay': 'Kamuning'},
+    28: {'city': 'quezon', 'barangay': 'Libis'},
+    29: {'city': 'quezon', 'barangay': 'Project 4'},
+    30: {'city': 'quezon', 'barangay': 'Project 6'},
+    31: {'city': 'quezon', 'barangay': 'Project 8'},
+    32: {'city': 'quezon', 'barangay': 'San Francisco Del Monte'},
+    33: {'city': 'quezon', 'barangay': 'Santa Mesa Heights'},
+    34: {'city': 'quezon', 'barangay': 'Talipapa'},
+    35: {'city': 'quezon', 'barangay': 'Teachers Village'},
+    36: {'city': 'quezon', 'barangay': 'Baesa'},
+    37: {'city': 'quezon', 'barangay': 'Bagong Lipunan'},
+    38: {'city': 'quezon', 'barangay': 'Blue Ridge'},
+    39: {'city': 'quezon', 'barangay': 'Holy Spirit'},
+    40: {'city': 'quezon', 'barangay': 'Payatas'},
+    
+    # MAKATI
+    46: {'city': 'makati', 'barangay': 'Poblacion'},
+    47: {'city': 'makati', 'barangay': 'Bel-Air'},
+    48: {'city': 'makati', 'barangay': 'Forbes Park'},
+    49: {'city': 'makati', 'barangay': 'Dasmariñas'},
+    50: {'city': 'makati', 'barangay': 'Urdaneta'},
+    51: {'city': 'makati', 'barangay': 'San Lorenzo'},
+    
+    # Add more as needed - CSV will provide the barangay_id
+}
+
+def get_city_from_barangay_id(barangay_id: int) -> str:
+    """
+    Get city ID from barangay_id (from CSV).
+    
+    Args:
+        barangay_id: The barangay ID from CSV
+    
+    Returns:
+        City ID (e.g., 'manila', 'quezon')
+    """
+    if barangay_id in BARANGAY_ID_MAP:
+        return BARANGAY_ID_MAP[barangay_id]['city']
+    
+    # If not found in mapping, return 'unknown'
+    logger.warning(f"⚠️ Barangay ID {barangay_id} not found in mapping")
+    return 'unknown'
+
 def validate_and_prepare_dataframe(df: pd.DataFrame) -> pd.DataFrame:
     """
     Validate and prepare DataFrame for ML pipeline.
@@ -157,8 +237,8 @@ def validate_and_prepare_dataframe(df: pd.DataFrame) -> pd.DataFrame:
     if 'customer_class' not in df_clean.columns:
         df_clean['customer_class'] = 'residential'
     
-    if 'barangay' not in df_clean.columns:
-        df_clean['barangay'] = 'Unknown'
+    # DON'T add barangay here - it will be added later from barangay_id lookup
+    # The ML model doesn't need the barangay text column
     
     logger.info(f"✅ Data prepared: {len(df_clean)} rows, "
                f"{len([c for c in df_clean.columns if c.startswith('monthly_consumption_')])} consumption months")
@@ -179,7 +259,7 @@ def get_ml_pipeline():
                 'meter_id': 'TEST_INIT',
                 'transformer_id': 'TX_TEST',
                 'customer_class': 'residential',
-                'barangay': 'Test',
+                'barangay_id': 1,
                 'lat': 14.5,
                 'lon': 120.9,
                 'monthly_consumption_202411': 100,
@@ -257,7 +337,7 @@ async def run_analysis(file: UploadFile = File(...)):
         # Validate required columns
         required_cols = {
             "meter_id", "transformer_id", "customer_class", 
-            "barangay", "lat", "lon", "kVA"
+            "barangay_id", "lat", "lon", "kVA"
         }
         
         # Check for monthly consumption columns
@@ -401,13 +481,21 @@ def aggregate_hierarchical_data(df: pd.DataFrame) -> Dict[str, Any]:
         Dictionary with hierarchical data
     """
     
-    # Ensure city_id exists (extract from CSV city column or map from barangay)
-    if 'city' in df.columns:
-        # If CSV has city column, use it directly
+    # ✅ NEW LOGIC: Use barangay_id from CSV to lookup city
+    # CSV now contains barangay_id column with assigned IDs
+    if 'barangay_id' in df.columns:
+        # Map barangay_id to city using BARANGAY_ID_MAP
+        df['city_id'] = df['barangay_id'].apply(get_city_from_barangay_id)
+        df['city_name'] = df['city_id'].str.title().str.replace('_', ' ')
+        # Map barangay_id to barangay name
+        df['barangay'] = df['barangay_id'].apply(lambda bid: BARANGAY_ID_MAP.get(bid, {}).get('barangay', 'Unknown'))
+        logger.info(f"✅ Mapped cities from barangay_id: {df['city_id'].unique().tolist()}")
+    elif 'city' in df.columns:
+        # Fallback: If CSV has city column, use it directly
         df['city_id'] = df['city'].str.lower().str.replace(' ', '_')
         df['city_name'] = df['city'].str.title()
     elif 'city_id' not in df.columns:
-        # COMPREHENSIVE NCR Barangay-to-City Mapping (400+ barangays)
+        # Legacy: COMPREHENSIVE NCR Barangay-to-City Mapping (400+ barangays)
         barangay_to_city = {
             # MANILA (Major barangays)
             'Tondo': 'manila', 'Ermita': 'manila', 'Malate': 'manila', 'Paco': 'manila',
@@ -552,6 +640,7 @@ def aggregate_hierarchical_data(df: pd.DataFrame) -> Dict[str, Any]:
     for _, row in df.iterrows():
         meter_dict = row.to_dict()
         
+        # ✅ barangay_id already in CSV - no need to generate
         # Extract monthly consumptions as array
         monthly_consumptions = [row[col] for col in consumption_cols if pd.notna(row[col])]
         meter_dict['monthly_consumptions'] = monthly_consumptions
@@ -570,14 +659,19 @@ def aggregate_hierarchical_data(df: pd.DataFrame) -> Dict[str, Any]:
         'anomaly_score': 'mean',
         'lat': 'first',
         'lon': 'first',
-        'barangay': 'first',
+        'barangay_id': 'first',
         'city_id': 'first',
         'kVA': 'sum',
     }).reset_index()
     
+    # Add barangay name from barangay_id
+    transformer_agg['barangay'] = transformer_agg['barangay_id'].apply(
+        lambda bid: BARANGAY_ID_MAP.get(bid, {}).get('barangay', 'Unknown')
+    )
+    
     transformer_agg.columns = [
         'transformer_id', 'total_meters', 'avg_anomaly_score',
-        'lat', 'lon', 'barangay', 'city_id', 'capacity_kVA'
+        'lat', 'lon', 'barangay_id', 'city_id', 'capacity_kVA', 'barangay'
     ]
     
     # Count suspicious meters per transformer
@@ -597,7 +691,8 @@ def aggregate_hierarchical_data(df: pd.DataFrame) -> Dict[str, Any]:
     transformers = transformer_agg.to_dict(orient='records')
     
     # ========== BARANGAY LEVEL ==========
-    barangay_agg = transformer_agg.groupby('barangay').agg({
+    # ✅ barangay_id already in DataFrame from CSV
+    barangay_agg = transformer_agg.groupby(['barangay', 'barangay_id']).agg({
         'transformer_id': 'count',
         'avg_anomaly_score': 'mean',
         'lat': 'mean',
@@ -606,13 +701,13 @@ def aggregate_hierarchical_data(df: pd.DataFrame) -> Dict[str, Any]:
     }).reset_index()
     
     barangay_agg.columns = [
-        'barangay', 'total_transformers', 'avg_risk_score',
+        'barangay', 'barangay_id', 'total_transformers', 'avg_risk_score',
         'lat', 'lon', 'city_id'
     ]
     
     # Count high-risk transformers per barangay
-    high_risk_counts = transformer_agg[transformer_agg['risk_level'] == 'HIGH'].groupby('barangay').size()
-    barangay_agg['high_risk_count'] = barangay_agg['barangay'].map(high_risk_counts).fillna(0).astype(int)
+    high_risk_counts = transformer_agg[transformer_agg['risk_level'] == 'HIGH'].groupby('barangay_id').size()
+    barangay_agg['high_risk_count'] = barangay_agg['barangay_id'].map(high_risk_counts).fillna(0).astype(int)
     
     barangays = barangay_agg.to_dict(orient='records')
     

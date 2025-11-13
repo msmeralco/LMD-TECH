@@ -1,0 +1,21 @@
+Dataset Generation Report
+================================================================================
+
+Generated: 2025-11-14 01:47:25
+Total Meters: 3000
+Locations: 20
+Transformers: 20
+
+Customer Class Distribution:
+customer_class
+Residential    2238
+Commercial      597
+Industrial      165
+
+Geographic Bounds:
+  Latitude: 14.558579 to 14.632269
+  Longitude: 120.953620 to 121.021316
+
+Files Saved:
+  - C:\Users\Ken Ira Talingting\Desktop\GhostLoadMapper-IDOL_Hackathon-\machine_learning\data\..\datasets\inference_manila\meter_consumption.csv
+  - C:\Users\Ken Ira Talingting\Desktop\GhostLoadMapper-IDOL_Hackathon-\machine_learning\data\..\datasets\inference_manila\generation_report.txt

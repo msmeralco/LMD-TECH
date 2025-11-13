@@ -1,0 +1,22 @@
+================================================================================
+SYNTHETIC DATA GENERATION REPORT
+================================================================================
+
+Generated: 2025-11-13 23:43:13
+Random Seed: 42
+
+Total Meters: 50
+Total Transformers: 5
+Anomaly Rate: 15.0%
+Expected Theft Cases: 7
+
+Customer Class Distribution:
+  residential: 27 (54.0%)
+  commercial: 16 (32.0%)
+  industrial: 7 (14.0%)
+
+Consumption Statistics (kWh/month):
+  Mean: 1198.34
+  Std: 1410.54
+  Min: 9.38
+  Max: 6723.33

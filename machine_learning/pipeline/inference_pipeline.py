@@ -315,8 +315,8 @@ class InferencePipeline:
         # Extract the feature DataFrame
         features_df = result.data
         
-        # Select only numeric features (exclude identifiers)
-        exclude_columns = {'meter_id', 'transformer_id', 'anomaly_flag', 'barangay', 'customer_class'}
+        # Select only numeric features (exclude identifiers and categorical IDs)
+        exclude_columns = {'meter_id', 'transformer_id', 'anomaly_flag', 'barangay', 'barangay_id', 'customer_class'}
         numeric_cols = features_df.select_dtypes(include=[np.number]).columns.tolist()
         feature_columns = [col for col in numeric_cols if col not in exclude_columns]
         

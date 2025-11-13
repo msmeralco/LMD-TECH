@@ -9,6 +9,7 @@ export interface Meter {
   meterNumber: string;
   transformerId: string;
   barangay: string;
+  barangay_id?: number; // Unique ID to handle duplicate barangay names
   city_id: string; // ✅ CRITICAL: Required for city grouping in DistrictMapView
   feeder: string;
   riskLevel: 'high' | 'medium' | 'low';
