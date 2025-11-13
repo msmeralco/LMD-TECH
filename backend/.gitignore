@@ -7,3 +7,7 @@ firebase-credentials.json
 ghost-load-mapper-firebase-adminsdk-*.json 
 *.egg-info/
 .DS_Store
+# Firebase credentials (CRITICAL - NEVER COMMIT!)
+*firebase-adminsdk*.json
+ghost-load-mapper-firebase-adminsdk-*.json
+backend/ghost-load-mapper-firebase-adminsdk-*.json
