@@ -1,0 +1,39 @@
+# Python virtual environment
+venv/
+env/
+ENV/
+
+# Python cache
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+
+# Generated data directories
+generated_data/
+demo_data/
+training_data/
+custom_data/
+ml_data/
+export_data/
+analysis_data/
+
+# Testing
+.pytest_cache/
+htmlcov/
+.coverage
+.coverage.*
+
+# Logs
+*.log
+
+# IDEs
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db

@@ -1,0 +1,41 @@
+# Generated data directories
+generated_data/
+demo_data/
+training_data/
+custom_data/
+ml_data/
+export_data/
+analysis_data/
+repro_test_1/
+repro_test_2/
+low_anomaly/
+high_anomaly/
+normal/
+batch_*/
+
+# Python cache
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+
+# Testing
+.pytest_cache/
+htmlcov/
+.coverage
+.coverage.*
+
+# Logs
+*.log
+synthetic_data_generation.log
+
+# IDEs
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
