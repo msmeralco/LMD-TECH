@@ -1,0 +1,9 @@
+.venv
+__pycache__/
+*.pyc
+.env
+.env.local
+firebase-credentials.json
+ghost-load-mapper-firebase-adminsdk-*.json  # ← Add this line
+*.egg-info/
+.DS_Store
