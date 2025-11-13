@@ -1,0 +1,364 @@
+2025-11-13 14:59:14 - INFO - [logger.py:410] - Logger 'root' configured (level=INFO, file=True, console=True)
+2025-11-13 14:59:14 - INFO - [logger.py:655] - This is an INFO message
+2025-11-13 14:59:14 - WARNING - [logger.py:656] - This is a WARNING message
+2025-11-13 14:59:14 - ERROR - [logger.py:657] - This is an ERROR message
+2025-11-13 14:59:14 - CRITICAL - [logger.py:658] - This is a CRITICAL message
+2025-11-13 14:59:14 - INFO - [logger.py:410] - Logger 'test_module' configured (level=INFO, file=True, console=True)
+2025-11-13 14:59:14 - INFO - [logger.py:668] - Module logger created
+2025-11-13 14:59:14 - INFO - [logger.py:678] - Starting training
+2025-11-13 14:59:14 - INFO - [logger.py:680] - Processing batch
+2025-11-13 14:59:14 - INFO - [logger.py:682] - Context cleared
+2025-11-13 14:59:14 - INFO - [logger.py:511] - test_operation started
+2025-11-13 14:59:14 - INFO - [logger.py:521] - test_operation completed in 0.12s
+2025-11-13 14:59:14 - ERROR - [logger.py:551] - Caught test exception
+Traceback (most recent call last):
+  File "C:\Users\Ken Ira Talingting\Desktop\GhostLoadMapper-IDOL_Hackathon-\machine_learning\utils\logger.py", line 702, in <module>
+    raise ValueError("Test exception")
+ValueError: Test exception
+2025-11-13 14:59:52 - INFO - [logger.py:410] - Logger 'root' configured (level=INFO, file=True, console=True)
+2025-11-13 14:59:52 - INFO - [logger.py:410] - Logger 'example_usage' configured (level=INFO, file=True, console=True)
+2025-11-13 14:59:52 - INFO - [test_logger_usage.py:18] - Starting ML pipeline
+2025-11-13 14:59:52 - INFO - [test_logger_usage.py:22] - Training model
+2025-11-13 14:59:52 - INFO - [logger.py:511] - model_training started
+2025-11-13 14:59:52 - INFO - [logger.py:521] - model_training completed in 0.05s
+2025-11-13 14:59:52 - INFO - [test_logger_usage.py:28] - Model trained successfully
+2025-11-13 14:59:52 - INFO - [test_logger_usage.py:32] - Starting evaluation
+2025-11-13 14:59:52 - INFO - [test_logger_usage.py:35] - Calculating metrics
+2025-11-13 14:59:52 - INFO - [test_logger_usage.py:37] - Pipeline complete
+2025-11-13 15:11:01 - INFO - [logger.py:410] - Logger 'machine_learning.utils.data_validator' configured (level=INFO, file=True, console=True)
+2025-11-13 15:11:01 - INFO - [logger.py:410] - Logger 'example_usage' configured (level=INFO, file=True, console=True)
+2025-11-13 15:11:01 - INFO - [test_data_validator_usage.py:238] - Starting DataValidator examples
+2025-11-13 15:11:01 - INFO - [test_data_validator_usage.py:44] - Validating valid meter data
+2025-11-13 15:11:01 - INFO - [data_validator.py:574] - DataValidator initialized
+2025-11-13 15:11:01 - INFO - [data_validator.py:608] - Validating meter data: 5 rows, 5 columns
+2025-11-13 15:11:01 - INFO - [data_validator.py:662] - Meter data validation PASSED: 5 rows validated successfully
+2025-11-13 15:11:01 - INFO - [test_data_validator_usage.py:53] - ✓ Valid data passed all validation checks
+2025-11-13 15:11:01 - INFO - [test_data_validator_usage.py:75] - Attempting to validate data with missing columns
+2025-11-13 15:11:01 - INFO - [data_validator.py:574] - DataValidator initialized
+2025-11-13 15:11:01 - INFO - [data_validator.py:608] - Validating meter data: 3 rows, 2 columns
+2025-11-13 15:11:01 - ERROR - [data_validator.py:298] - Schema validation failed: missing columns ['transformer_id']
+2025-11-13 15:11:01 - ERROR - [data_validator.py:665] - Meter data validation FAILED: 1 critical issues found
+2025-11-13 15:11:01 - ERROR - [data_validator.py:667] -   - [CRITICAL] Missing required columns: ['transformer_id']
+2025-11-13 15:11:01 - ERROR - [test_data_validator_usage.py:80] - Validation failed: Missing required fields: ['transformer_id']
+2025-11-13 15:11:01 - INFO - [data_validator.py:574] - DataValidator initialized
+2025-11-13 15:11:01 - INFO - [test_data_validator_usage.py:108] - Validating consumption arrays
+2025-11-13 15:11:01 - INFO - [data_validator.py:608] - Validating meter data: 4 rows, 3 columns
+2025-11-13 15:11:01 - ERROR - [data_validator.py:665] - Meter data validation FAILED: 3 critical issues found
+2025-11-13 15:11:01 - ERROR - [data_validator.py:667] -   - [CRITICAL] Field 'monthly_consumption': Invalid format in 'monthly_consumption' (not parseable as numeric array) (Affected rows: 1, sample: [1])
+2025-11-13 15:11:01 - ERROR - [data_validator.py:667] -   - [CRITICAL] Field 'monthly_consumption': 'monthly_consumption' must have exactly 12 values (Affected rows: 1, sample: [0])
+2025-11-13 15:11:01 - ERROR - [data_validator.py:667] -   - [CRITICAL] Field 'monthly_consumption': 'monthly_consumption' contains values outside valid range [0.0, 1000000.0] (Affected rows: 1, sample: [2])
+2025-11-13 15:11:01 - WARNING - [test_data_validator_usage.py:122] - Found 3 critical issues
+2025-11-13 15:11:01 - INFO - [data_validator.py:574] - DataValidator initialized
+2025-11-13 15:11:01 - INFO - [test_data_validator_usage.py:146] - Generating validation summary
+2025-11-13 15:11:01 - INFO - [data_validator.py:608] - Validating meter data: 4 rows, 3 columns
+2025-11-13 15:11:01 - WARNING - [data_validator.py:538] - Column 'meter_id' has 1 null values
+2025-11-13 15:11:01 - WARNING - [data_validator.py:538] - Column 'transformer_id' has 1 null values
+2025-11-13 15:11:01 - ERROR - [data_validator.py:665] - Meter data validation FAILED: 4 critical issues found
+2025-11-13 15:11:01 - ERROR - [data_validator.py:667] -   - [CRITICAL] Field 'monthly_consumption': Invalid format in 'monthly_consumption' (not parseable as numeric array) (Affected rows: 1, sample: [3])
+2025-11-13 15:11:01 - ERROR - [data_validator.py:667] -   - [CRITICAL] Field 'monthly_consumption': 'monthly_consumption' must have exactly 12 values (Affected rows: 1, sample: [1])
+2025-11-13 15:11:01 - ERROR - [data_validator.py:667] -   - [CRITICAL] Field 'meter_id': Column 'meter_id' contains null values (Affected rows: 1, sample: [2])
+2025-11-13 15:11:01 - ERROR - [data_validator.py:667] -   - [CRITICAL] Field 'transformer_id': Column 'transformer_id' contains null values (Affected rows: 1, sample: [3])
+2025-11-13 15:11:01 - INFO - [data_validator.py:574] - DataValidator initialized
+2025-11-13 15:11:01 - INFO - [test_data_validator_usage.py:206] - Validating with custom quarterly schema
+2025-11-13 15:11:01 - INFO - [test_data_validator_usage.py:225] - Custom schema validation passed
+2025-11-13 15:11:01 - INFO - [test_data_validator_usage.py:251] - All examples completed successfully
+2025-11-13 15:16:24 - INFO - [logger.py:410] - Logger 'machine_learning.utils.data_validator' configured (level=INFO, file=True, console=True)
+2025-11-13 15:16:24 - INFO - [data_validator.py:574] - DataValidator initialized
+2025-11-13 15:16:24 - INFO - [data_validator.py:608] - Validating meter data: 2 rows, 3 columns
+2025-11-13 15:16:24 - INFO - [data_validator.py:662] - Meter data validation PASSED: 2 rows validated successfully
+2025-11-13 15:16:24 - INFO - [data_validator.py:608] - Validating meter data: 2 rows, 2 columns
+2025-11-13 15:16:24 - ERROR - [data_validator.py:298] - Schema validation failed: missing columns ['transformer_id']
+2025-11-13 15:16:24 - ERROR - [data_validator.py:665] - Meter data validation FAILED: 1 critical issues found
+2025-11-13 15:16:24 - ERROR - [data_validator.py:667] -   - [CRITICAL] Missing required columns: ['transformer_id']
+2025-11-13 15:16:24 - INFO - [data_validator.py:608] - Validating meter data: 1 rows, 2 columns
+2025-11-13 15:16:24 - ERROR - [data_validator.py:298] - Schema validation failed: missing columns ['transformer_id']
+2025-11-13 15:16:24 - ERROR - [data_validator.py:665] - Meter data validation FAILED: 2 critical issues found
+2025-11-13 15:16:24 - ERROR - [data_validator.py:667] -   - [CRITICAL] Missing required columns: ['transformer_id']
+2025-11-13 15:16:24 - ERROR - [data_validator.py:667] -   - [CRITICAL] Field 'monthly_consumption': 'monthly_consumption' must have exactly 12 values (Affected rows: 1, sample: [0])
+2025-11-13 15:16:42 - INFO - [logger.py:410] - Logger 'machine_learning.utils.data_validator' configured (level=INFO, file=True, console=True)
+2025-11-13 15:16:42 - INFO - [data_validator.py:574] - DataValidator initialized
+2025-11-13 15:16:42 - INFO - [data_validator.py:608] - Validating meter data: 2 rows, 3 columns
+2025-11-13 15:16:42 - INFO - [data_validator.py:662] - Meter data validation PASSED: 2 rows validated successfully
+2025-11-13 15:16:42 - INFO - [data_validator.py:608] - Validating meter data: 2 rows, 2 columns
+2025-11-13 15:16:42 - ERROR - [data_validator.py:298] - Schema validation failed: missing columns ['transformer_id']
+2025-11-13 15:16:42 - ERROR - [data_validator.py:665] - Meter data validation FAILED: 1 critical issues found
+2025-11-13 15:16:42 - ERROR - [data_validator.py:667] -   - [CRITICAL] Missing required columns: ['transformer_id']
+2025-11-13 15:16:42 - INFO - [data_validator.py:608] - Validating meter data: 1 rows, 2 columns
+2025-11-13 15:16:42 - ERROR - [data_validator.py:298] - Schema validation failed: missing columns ['transformer_id']
+2025-11-13 15:16:42 - ERROR - [data_validator.py:665] - Meter data validation FAILED: 2 critical issues found
+2025-11-13 15:16:42 - ERROR - [data_validator.py:667] -   - [CRITICAL] Missing required columns: ['transformer_id']
+2025-11-13 15:16:42 - ERROR - [data_validator.py:667] -   - [CRITICAL] Field 'monthly_consumption': 'monthly_consumption' must have exactly 12 values (Affected rows: 1, sample: [0])
+2025-11-13 15:18:05 - INFO - [logger.py:410] - Logger 'machine_learning.utils.data_validator' configured (level=INFO, file=True, console=True)
+2025-11-13 15:18:05 - INFO - [data_validator.py:574] - DataValidator initialized
+2025-11-13 15:18:05 - INFO - [data_validator.py:608] - Validating meter data: 2 rows, 3 columns
+2025-11-13 15:18:05 - INFO - [data_validator.py:662] - Meter data validation PASSED: 2 rows validated successfully
+2025-11-13 15:18:05 - INFO - [data_validator.py:608] - Validating meter data: 2 rows, 2 columns
+2025-11-13 15:18:05 - ERROR - [data_validator.py:298] - Schema validation failed: missing columns ['transformer_id']
+2025-11-13 15:18:05 - ERROR - [data_validator.py:665] - Meter data validation FAILED: 1 critical issues found
+2025-11-13 15:18:05 - ERROR - [data_validator.py:667] -   - [CRITICAL] Missing required columns: ['transformer_id']
+2025-11-13 15:18:05 - INFO - [data_validator.py:608] - Validating meter data: 1 rows, 2 columns
+2025-11-13 15:18:05 - ERROR - [data_validator.py:298] - Schema validation failed: missing columns ['transformer_id']
+2025-11-13 15:18:05 - ERROR - [data_validator.py:665] - Meter data validation FAILED: 2 critical issues found
+2025-11-13 15:18:05 - ERROR - [data_validator.py:667] -   - [CRITICAL] Missing required columns: ['transformer_id']
+2025-11-13 15:18:05 - ERROR - [data_validator.py:667] -   - [CRITICAL] Field 'monthly_consumption': 'monthly_consumption' must have exactly 12 values (Affected rows: 1, sample: [0])
+2025-11-13 16:40:37 - INFO - [logger.py:410] - Logger 'machine_learning.utils.data_validator' configured (level=INFO, file=True, console=True)
+2025-11-13 16:40:37 - INFO - [logger.py:410] - Logger 'machine_learning.pipeline.training_pipeline' configured (level=INFO, file=True, console=True)
+2025-11-13 16:40:37 - INFO - [training_pipeline.py:304] - Loaded configuration from C:\Users\Ken Ira Talingting\Desktop\GhostLoadMapper-IDOL_Hackathon-\machine_learning\config\config.yaml
+2025-11-13 16:40:37 - INFO - [training_pipeline.py:324] - Initialized TrainingPipeline: dataset=C:\Users\Ken Ira Talingting\Desktop\GhostLoadMapper-IDOL_Hackathon-\machine_learning\datasets\development, output=C:\Users\Ken Ira Talingting\Desktop\GhostLoadMapper-IDOL_Hackathon-\output
+2025-11-13 16:40:37 - INFO - [training_pipeline.py:348] - ================================================================================
+2025-11-13 16:40:38 - INFO - [training_pipeline.py:349] - Starting GhostLoad Mapper Training Pipeline
+2025-11-13 16:40:38 - INFO - [training_pipeline.py:350] - ================================================================================
+2025-11-13 16:40:38 - INFO - [training_pipeline.py:355] - [Stage 1/6] Loading data...
+2025-11-13 16:40:38 - INFO - [training_pipeline.py:468] - Loading data from C:\Users\Ken Ira Talingting\Desktop\GhostLoadMapper-IDOL_Hackathon-\machine_learning\datasets\development
+2025-11-13 16:40:38 - INFO - [training_pipeline.py:482] - Loaded 1000 meters
+2025-11-13 16:40:38 - INFO - [training_pipeline.py:489] - Loaded 30 transformers
+2025-11-13 16:40:38 - INFO - [data_validator.py:574] - DataValidator initialized
+2025-11-13 16:40:38 - INFO - [data_validator.py:608] - Validating meter data: 1000 rows, 19 columns
+2025-11-13 16:40:38 - ERROR - [data_validator.py:298] - Schema validation failed: missing columns ['monthly_consumption']
+2025-11-13 16:40:38 - ERROR - [data_validator.py:665] - Meter data validation FAILED: 1 critical issues found
+2025-11-13 16:40:38 - ERROR - [data_validator.py:667] -   - [CRITICAL] Missing required columns: ['monthly_consumption']
+2025-11-13 16:40:38 - WARNING - [training_pipeline.py:496] - Data validation issues found: 1
+2025-11-13 16:40:38 - WARNING - [training_pipeline.py:498] -   - [CRITICAL] Missing required columns: ['monthly_consumption']
+2025-11-13 16:40:38 - INFO - [training_pipeline.py:963] - ✓ Stage 'load_data' completed in 0.03s
+2025-11-13 16:40:38 - INFO - [training_pipeline.py:362] - [Stage 2/6] Preprocessing data...
+2025-11-13 16:40:38 - INFO - [training_pipeline.py:520] - Preprocessing data...
+2025-11-13 16:40:38 - INFO - [training_pipeline.py:536] - Preprocessed 1000 meters
+2025-11-13 16:40:38 - INFO - [training_pipeline.py:540] - Loaded 30 transformers
+2025-11-13 16:40:38 - INFO - [training_pipeline.py:963] - ✓ Stage 'preprocess' completed in 0.56s
+2025-11-13 16:40:38 - INFO - [training_pipeline.py:372] - [Stage 3/6] Engineering features...
+2025-11-13 16:40:38 - INFO - [training_pipeline.py:560] - Engineering features...
+2025-11-13 16:40:39 - INFO - [training_pipeline.py:574] - Engineered 23 features for 1000 meters
+2025-11-13 16:40:39 - INFO - [training_pipeline.py:963] - ✓ Stage 'engineer_features' completed in 0.76s
+2025-11-13 16:40:39 - INFO - [training_pipeline.py:382] - [Stage 4/6] Training models...
+2025-11-13 16:40:39 - INFO - [training_pipeline.py:590] - Training models...
+2025-11-13 16:40:39 - ERROR - [training_pipeline.py:969] - ✗ Stage 'train_models' failed after 0.01s: argument of type 'PipelineConfig' is not iterable
+2025-11-13 16:40:39 - ERROR - [training_pipeline.py:449] - ✗ Pipeline failed after 1.36s: argument of type 'PipelineConfig' is not iterable
+2025-11-13 16:46:09 - INFO - [logger.py:410] - Logger 'machine_learning.utils.data_validator' configured (level=INFO, file=True, console=True)
+2025-11-13 16:46:09 - INFO - [logger.py:410] - Logger 'machine_learning.pipeline.training_pipeline' configured (level=INFO, file=True, console=True)
+2025-11-13 16:46:09 - INFO - [training_pipeline.py:304] - Loaded configuration from C:\Users\Ken Ira Talingting\Desktop\GhostLoadMapper-IDOL_Hackathon-\machine_learning\config\config.yaml
+2025-11-13 16:46:09 - INFO - [training_pipeline.py:324] - Initialized TrainingPipeline: dataset=C:\Users\Ken Ira Talingting\Desktop\GhostLoadMapper-IDOL_Hackathon-\machine_learning\datasets\development, output=C:\Users\Ken Ira Talingting\Desktop\GhostLoadMapper-IDOL_Hackathon-\output
+2025-11-13 16:46:09 - INFO - [training_pipeline.py:348] - ================================================================================
+2025-11-13 16:46:09 - INFO - [training_pipeline.py:349] - Starting GhostLoad Mapper Training Pipeline
+2025-11-13 16:46:09 - INFO - [training_pipeline.py:350] - ================================================================================
+2025-11-13 16:46:09 - INFO - [training_pipeline.py:355] - [Stage 1/6] Loading data...
+2025-11-13 16:46:09 - INFO - [training_pipeline.py:468] - Loading data from C:\Users\Ken Ira Talingting\Desktop\GhostLoadMapper-IDOL_Hackathon-\machine_learning\datasets\development
+2025-11-13 16:46:09 - INFO - [training_pipeline.py:482] - Loaded 1000 meters
+2025-11-13 16:46:09 - INFO - [training_pipeline.py:489] - Loaded 30 transformers
+2025-11-13 16:46:09 - INFO - [data_validator.py:581] - DataValidator initialized
+2025-11-13 16:46:09 - INFO - [data_validator.py:615] - Validating meter data: 1000 rows, 19 columns
+2025-11-13 16:46:09 - INFO - [data_validator.py:678] - Meter data validation PASSED: 1000 rows validated successfully
+2025-11-13 16:46:09 - INFO - [training_pipeline.py:965] - ✓ Stage 'load_data' completed in 0.06s
+2025-11-13 16:46:09 - INFO - [training_pipeline.py:362] - [Stage 2/6] Preprocessing data...
+2025-11-13 16:46:09 - INFO - [training_pipeline.py:520] - Preprocessing data...
+2025-11-13 16:46:09 - INFO - [training_pipeline.py:536] - Preprocessed 1000 meters
+2025-11-13 16:46:09 - INFO - [training_pipeline.py:540] - Loaded 30 transformers
+2025-11-13 16:46:09 - INFO - [training_pipeline.py:965] - ✓ Stage 'preprocess' completed in 0.49s
+2025-11-13 16:46:09 - INFO - [training_pipeline.py:372] - [Stage 3/6] Engineering features...
+2025-11-13 16:46:09 - INFO - [training_pipeline.py:560] - Engineering features...
+2025-11-13 16:46:10 - INFO - [training_pipeline.py:574] - Engineered 23 features for 1000 meters
+2025-11-13 16:46:10 - INFO - [training_pipeline.py:965] - ✓ Stage 'engineer_features' completed in 0.75s
+2025-11-13 16:46:10 - INFO - [training_pipeline.py:382] - [Stage 4/6] Training models...
+2025-11-13 16:46:10 - INFO - [training_pipeline.py:590] - Training models...
+2025-11-13 16:46:10 - INFO - [training_pipeline.py:698] - Feature selection summary:
+2025-11-13 16:46:10 - INFO - [training_pipeline.py:699] -   - Total columns: 23
+2025-11-13 16:46:10 - INFO - [training_pipeline.py:700] -   - Selected numeric features: 19
+2025-11-13 16:46:10 - INFO - [training_pipeline.py:701] -   - Excluded columns: 4
+2025-11-13 16:46:10 - INFO - [training_pipeline.py:707] -   - Excluded categorical: ['barangay', 'customer_class', 'meter_id', 'transformer_id']
+2025-11-13 16:46:10 - INFO - [training_pipeline.py:711] -   - Excluded identifiers: ['barangay', 'customer_class', 'meter_id', 'transformer_id']
+2025-11-13 16:46:10 - INFO - [training_pipeline.py:623] - Training with 1000 samples, 19 features
+2025-11-13 16:46:10 - ERROR - [training_pipeline.py:971] - ✗ Stage 'train_models' failed after 0.07s: Model training failed: 'IsolationForestConfig' object has no attribute 'n_jobs'
+2025-11-13 16:46:10 - ERROR - [training_pipeline.py:449] - ✗ Pipeline failed after 1.37s: Model training failed: 'IsolationForestConfig' object has no attribute 'n_jobs'
+2025-11-13 16:48:16 - INFO - [logger.py:410] - Logger 'machine_learning.utils.data_validator' configured (level=INFO, file=True, console=True)
+2025-11-13 16:48:16 - INFO - [logger.py:410] - Logger 'machine_learning.pipeline.training_pipeline' configured (level=INFO, file=True, console=True)
+2025-11-13 16:48:16 - INFO - [training_pipeline.py:304] - Loaded configuration from C:\Users\Ken Ira Talingting\Desktop\GhostLoadMapper-IDOL_Hackathon-\machine_learning\config\config.yaml
+2025-11-13 16:48:16 - INFO - [training_pipeline.py:324] - Initialized TrainingPipeline: dataset=C:\Users\Ken Ira Talingting\Desktop\GhostLoadMapper-IDOL_Hackathon-\machine_learning\datasets\development, output=C:\Users\Ken Ira Talingting\Desktop\GhostLoadMapper-IDOL_Hackathon-\output
+2025-11-13 16:48:16 - INFO - [training_pipeline.py:348] - ================================================================================
+2025-11-13 16:48:16 - INFO - [training_pipeline.py:349] - Starting GhostLoad Mapper Training Pipeline
+2025-11-13 16:48:16 - INFO - [training_pipeline.py:350] - ================================================================================
+2025-11-13 16:48:16 - INFO - [training_pipeline.py:355] - [Stage 1/6] Loading data...
+2025-11-13 16:48:16 - INFO - [training_pipeline.py:468] - Loading data from C:\Users\Ken Ira Talingting\Desktop\GhostLoadMapper-IDOL_Hackathon-\machine_learning\datasets\development
+2025-11-13 16:48:16 - INFO - [training_pipeline.py:482] - Loaded 1000 meters
+2025-11-13 16:48:16 - INFO - [training_pipeline.py:489] - Loaded 30 transformers
+2025-11-13 16:48:16 - INFO - [data_validator.py:581] - DataValidator initialized
+2025-11-13 16:48:16 - INFO - [data_validator.py:615] - Validating meter data: 1000 rows, 19 columns
+2025-11-13 16:48:16 - INFO - [data_validator.py:678] - Meter data validation PASSED: 1000 rows validated successfully
+2025-11-13 16:48:16 - INFO - [training_pipeline.py:965] - ✓ Stage 'load_data' completed in 0.06s
+2025-11-13 16:48:16 - INFO - [training_pipeline.py:362] - [Stage 2/6] Preprocessing data...
+2025-11-13 16:48:16 - INFO - [training_pipeline.py:520] - Preprocessing data...
+2025-11-13 16:48:17 - INFO - [training_pipeline.py:536] - Preprocessed 1000 meters
+2025-11-13 16:48:17 - INFO - [training_pipeline.py:540] - Loaded 30 transformers
+2025-11-13 16:48:17 - INFO - [training_pipeline.py:965] - ✓ Stage 'preprocess' completed in 0.58s
+2025-11-13 16:48:17 - INFO - [training_pipeline.py:372] - [Stage 3/6] Engineering features...
+2025-11-13 16:48:17 - INFO - [training_pipeline.py:560] - Engineering features...
+2025-11-13 16:48:17 - INFO - [training_pipeline.py:574] - Engineered 23 features for 1000 meters
+2025-11-13 16:48:17 - INFO - [training_pipeline.py:965] - ✓ Stage 'engineer_features' completed in 0.70s
+2025-11-13 16:48:17 - INFO - [training_pipeline.py:382] - [Stage 4/6] Training models...
+2025-11-13 16:48:17 - INFO - [training_pipeline.py:590] - Training models...
+2025-11-13 16:48:18 - INFO - [training_pipeline.py:698] - Feature selection summary:
+2025-11-13 16:48:18 - INFO - [training_pipeline.py:699] -   - Total columns: 23
+2025-11-13 16:48:18 - INFO - [training_pipeline.py:700] -   - Selected numeric features: 19
+2025-11-13 16:48:18 - INFO - [training_pipeline.py:701] -   - Excluded columns: 4
+2025-11-13 16:48:18 - INFO - [training_pipeline.py:707] -   - Excluded categorical: ['meter_id', 'transformer_id', 'customer_class', 'barangay']
+2025-11-13 16:48:18 - INFO - [training_pipeline.py:711] -   - Excluded identifiers: ['meter_id', 'transformer_id', 'customer_class', 'barangay']
+2025-11-13 16:48:18 - INFO - [training_pipeline.py:623] - Training with 1000 samples, 19 features
+2025-11-13 16:48:18 - ERROR - [training_pipeline.py:971] - ✗ Stage 'train_models' failed after 0.11s: Model training failed: sklearn.ensemble._iforest.IsolationForest() got multiple values for keyword argument 'contamination'
+2025-11-13 16:48:18 - ERROR - [training_pipeline.py:449] - ✗ Pipeline failed after 1.46s: Model training failed: sklearn.ensemble._iforest.IsolationForest() got multiple values for keyword argument 'contamination'
+2025-11-13 16:55:00 - INFO - [logger.py:410] - Logger 'machine_learning.utils.data_validator' configured (level=INFO, file=True, console=True)
+2025-11-13 16:55:00 - INFO - [logger.py:410] - Logger 'machine_learning.pipeline.training_pipeline' configured (level=INFO, file=True, console=True)
+2025-11-13 16:55:00 - INFO - [training_pipeline.py:304] - Loaded configuration from C:\Users\Ken Ira Talingting\Desktop\GhostLoadMapper-IDOL_Hackathon-\machine_learning\config\config.yaml
+2025-11-13 16:55:00 - INFO - [training_pipeline.py:324] - Initialized TrainingPipeline: dataset=C:\Users\Ken Ira Talingting\Desktop\GhostLoadMapper-IDOL_Hackathon-\machine_learning\datasets\development, output=C:\Users\Ken Ira Talingting\Desktop\GhostLoadMapper-IDOL_Hackathon-\output
+2025-11-13 16:55:00 - INFO - [training_pipeline.py:348] - ================================================================================
+2025-11-13 16:55:00 - INFO - [training_pipeline.py:349] - Starting GhostLoad Mapper Training Pipeline
+2025-11-13 16:55:00 - INFO - [training_pipeline.py:350] - ================================================================================
+2025-11-13 16:55:00 - INFO - [training_pipeline.py:355] - [Stage 1/6] Loading data...
+2025-11-13 16:55:00 - INFO - [training_pipeline.py:468] - Loading data from C:\Users\Ken Ira Talingting\Desktop\GhostLoadMapper-IDOL_Hackathon-\machine_learning\datasets\development
+2025-11-13 16:55:00 - INFO - [training_pipeline.py:482] - Loaded 1000 meters
+2025-11-13 16:55:00 - INFO - [training_pipeline.py:489] - Loaded 30 transformers
+2025-11-13 16:55:00 - INFO - [data_validator.py:581] - DataValidator initialized
+2025-11-13 16:55:00 - INFO - [data_validator.py:615] - Validating meter data: 1000 rows, 19 columns
+2025-11-13 16:55:00 - INFO - [data_validator.py:678] - Meter data validation PASSED: 1000 rows validated successfully
+2025-11-13 16:55:00 - INFO - [training_pipeline.py:965] - ✓ Stage 'load_data' completed in 0.05s
+2025-11-13 16:55:00 - INFO - [training_pipeline.py:362] - [Stage 2/6] Preprocessing data...
+2025-11-13 16:55:00 - INFO - [training_pipeline.py:520] - Preprocessing data...
+2025-11-13 16:55:00 - INFO - [training_pipeline.py:536] - Preprocessed 1000 meters
+2025-11-13 16:55:00 - INFO - [training_pipeline.py:540] - Loaded 30 transformers
+2025-11-13 16:55:00 - INFO - [training_pipeline.py:965] - ✓ Stage 'preprocess' completed in 0.59s
+2025-11-13 16:55:00 - INFO - [training_pipeline.py:372] - [Stage 3/6] Engineering features...
+2025-11-13 16:55:00 - INFO - [training_pipeline.py:560] - Engineering features...
+2025-11-13 16:55:01 - INFO - [training_pipeline.py:574] - Engineered 23 features for 1000 meters
+2025-11-13 16:55:01 - INFO - [training_pipeline.py:965] - ✓ Stage 'engineer_features' completed in 0.75s
+2025-11-13 16:55:01 - INFO - [training_pipeline.py:382] - [Stage 4/6] Training models...
+2025-11-13 16:55:01 - INFO - [training_pipeline.py:590] - Training models...
+2025-11-13 16:55:01 - INFO - [training_pipeline.py:698] - Feature selection summary:
+2025-11-13 16:55:01 - INFO - [training_pipeline.py:699] -   - Total columns: 23
+2025-11-13 16:55:01 - INFO - [training_pipeline.py:700] -   - Selected numeric features: 19
+2025-11-13 16:55:01 - INFO - [training_pipeline.py:701] -   - Excluded columns: 4
+2025-11-13 16:55:01 - INFO - [training_pipeline.py:707] -   - Excluded categorical: ['transformer_id', 'customer_class', 'meter_id', 'barangay']
+2025-11-13 16:55:01 - INFO - [training_pipeline.py:711] -   - Excluded identifiers: ['transformer_id', 'customer_class', 'meter_id', 'barangay']
+2025-11-13 16:55:01 - INFO - [training_pipeline.py:623] - Training with 1000 samples, 19 features
+2025-11-13 16:55:01 - INFO - [training_pipeline.py:631] - Model trained: Isolation Forest
+2025-11-13 16:55:01 - INFO - [training_pipeline.py:632] - Training time: 0.25s
+2025-11-13 16:55:01 - ERROR - [training_pipeline.py:971] - ✗ Stage 'train_models' failed after 0.27s: 'IsolationForestDetector' object has no attribute 'model'
+2025-11-13 16:55:01 - ERROR - [training_pipeline.py:449] - ✗ Pipeline failed after 1.67s: 'IsolationForestDetector' object has no attribute 'model'
+2025-11-13 16:57:46 - INFO - [logger.py:410] - Logger 'machine_learning.utils.data_validator' configured (level=INFO, file=True, console=True)
+2025-11-13 16:57:46 - INFO - [logger.py:410] - Logger 'machine_learning.pipeline.training_pipeline' configured (level=INFO, file=True, console=True)
+2025-11-13 16:57:46 - INFO - [training_pipeline.py:304] - Loaded configuration from C:\Users\Ken Ira Talingting\Desktop\GhostLoadMapper-IDOL_Hackathon-\machine_learning\config\config.yaml
+2025-11-13 16:57:46 - INFO - [training_pipeline.py:324] - Initialized TrainingPipeline: dataset=C:\Users\Ken Ira Talingting\Desktop\GhostLoadMapper-IDOL_Hackathon-\machine_learning\datasets\development, output=C:\Users\Ken Ira Talingting\Desktop\GhostLoadMapper-IDOL_Hackathon-\output
+2025-11-13 16:57:46 - INFO - [training_pipeline.py:348] - ================================================================================
+2025-11-13 16:57:46 - INFO - [training_pipeline.py:349] - Starting GhostLoad Mapper Training Pipeline
+2025-11-13 16:57:46 - INFO - [training_pipeline.py:350] - ================================================================================
+2025-11-13 16:57:46 - INFO - [training_pipeline.py:355] - [Stage 1/6] Loading data...
+2025-11-13 16:57:46 - INFO - [training_pipeline.py:468] - Loading data from C:\Users\Ken Ira Talingting\Desktop\GhostLoadMapper-IDOL_Hackathon-\machine_learning\datasets\development
+2025-11-13 16:57:46 - INFO - [training_pipeline.py:482] - Loaded 1000 meters
+2025-11-13 16:57:46 - INFO - [training_pipeline.py:489] - Loaded 30 transformers
+2025-11-13 16:57:46 - INFO - [data_validator.py:581] - DataValidator initialized
+2025-11-13 16:57:46 - INFO - [data_validator.py:615] - Validating meter data: 1000 rows, 19 columns
+2025-11-13 16:57:46 - INFO - [data_validator.py:678] - Meter data validation PASSED: 1000 rows validated successfully
+2025-11-13 16:57:46 - INFO - [training_pipeline.py:966] - ✓ Stage 'load_data' completed in 0.04s
+2025-11-13 16:57:46 - INFO - [training_pipeline.py:362] - [Stage 2/6] Preprocessing data...
+2025-11-13 16:57:46 - INFO - [training_pipeline.py:520] - Preprocessing data...
+2025-11-13 16:57:47 - INFO - [training_pipeline.py:536] - Preprocessed 1000 meters
+2025-11-13 16:57:47 - INFO - [training_pipeline.py:540] - Loaded 30 transformers
+2025-11-13 16:57:47 - INFO - [training_pipeline.py:966] - ✓ Stage 'preprocess' completed in 0.60s
+2025-11-13 16:57:47 - INFO - [training_pipeline.py:372] - [Stage 3/6] Engineering features...
+2025-11-13 16:57:47 - INFO - [training_pipeline.py:560] - Engineering features...
+2025-11-13 16:57:47 - INFO - [training_pipeline.py:574] - Engineered 23 features for 1000 meters
+2025-11-13 16:57:47 - INFO - [training_pipeline.py:966] - ✓ Stage 'engineer_features' completed in 0.69s
+2025-11-13 16:57:47 - INFO - [training_pipeline.py:382] - [Stage 4/6] Training models...
+2025-11-13 16:57:47 - INFO - [training_pipeline.py:590] - Training models...
+2025-11-13 16:57:47 - INFO - [training_pipeline.py:699] - Feature selection summary:
+2025-11-13 16:57:47 - INFO - [training_pipeline.py:700] -   - Total columns: 23
+2025-11-13 16:57:47 - INFO - [training_pipeline.py:701] -   - Selected numeric features: 19
+2025-11-13 16:57:47 - INFO - [training_pipeline.py:702] -   - Excluded columns: 4
+2025-11-13 16:57:47 - INFO - [training_pipeline.py:708] -   - Excluded categorical: ['transformer_id', 'customer_class', 'meter_id', 'barangay']
+2025-11-13 16:57:47 - INFO - [training_pipeline.py:712] -   - Excluded identifiers: ['transformer_id', 'customer_class', 'meter_id', 'barangay']
+2025-11-13 16:57:47 - INFO - [training_pipeline.py:623] - Training with 1000 samples, 19 features
+2025-11-13 16:57:48 - INFO - [training_pipeline.py:631] - Model trained: Isolation Forest
+2025-11-13 16:57:48 - INFO - [training_pipeline.py:632] - Training time: 0.26s
+2025-11-13 16:57:48 - INFO - [training_pipeline.py:966] - ✓ Stage 'train_models' completed in 0.28s
+2025-11-13 16:57:48 - INFO - [training_pipeline.py:391] - [Stage 5/6] Evaluating models...
+2025-11-13 16:57:48 - INFO - [training_pipeline.py:752] - Evaluating models...
+2025-11-13 16:57:48 - ERROR - [training_pipeline.py:972] - ✗ Stage 'evaluate_models' failed after 0.00s: 'IsolationForestDetector' object has no attribute 'score_samples'
+2025-11-13 16:57:48 - ERROR - [training_pipeline.py:449] - ✗ Pipeline failed after 1.63s: 'IsolationForestDetector' object has no attribute 'score_samples'
+2025-11-13 16:59:09 - INFO - [logger.py:410] - Logger 'machine_learning.utils.data_validator' configured (level=INFO, file=True, console=True)
+2025-11-13 16:59:09 - INFO - [logger.py:410] - Logger 'machine_learning.pipeline.training_pipeline' configured (level=INFO, file=True, console=True)
+2025-11-13 16:59:09 - INFO - [training_pipeline.py:304] - Loaded configuration from C:\Users\Ken Ira Talingting\Desktop\GhostLoadMapper-IDOL_Hackathon-\machine_learning\config\config.yaml
+2025-11-13 16:59:09 - INFO - [training_pipeline.py:324] - Initialized TrainingPipeline: dataset=C:\Users\Ken Ira Talingting\Desktop\GhostLoadMapper-IDOL_Hackathon-\machine_learning\datasets\development, output=C:\Users\Ken Ira Talingting\Desktop\GhostLoadMapper-IDOL_Hackathon-\output
+2025-11-13 16:59:09 - INFO - [training_pipeline.py:348] - ================================================================================
+2025-11-13 16:59:09 - INFO - [training_pipeline.py:349] - Starting GhostLoad Mapper Training Pipeline
+2025-11-13 16:59:09 - INFO - [training_pipeline.py:350] - ================================================================================
+2025-11-13 16:59:09 - INFO - [training_pipeline.py:355] - [Stage 1/6] Loading data...
+2025-11-13 16:59:09 - INFO - [training_pipeline.py:468] - Loading data from C:\Users\Ken Ira Talingting\Desktop\GhostLoadMapper-IDOL_Hackathon-\machine_learning\datasets\development
+2025-11-13 16:59:09 - INFO - [training_pipeline.py:482] - Loaded 1000 meters
+2025-11-13 16:59:09 - INFO - [training_pipeline.py:489] - Loaded 30 transformers
+2025-11-13 16:59:09 - INFO - [data_validator.py:581] - DataValidator initialized
+2025-11-13 16:59:09 - INFO - [data_validator.py:615] - Validating meter data: 1000 rows, 19 columns
+2025-11-13 16:59:09 - INFO - [data_validator.py:678] - Meter data validation PASSED: 1000 rows validated successfully
+2025-11-13 16:59:09 - INFO - [training_pipeline.py:970] - ✓ Stage 'load_data' completed in 0.08s
+2025-11-13 16:59:09 - INFO - [training_pipeline.py:362] - [Stage 2/6] Preprocessing data...
+2025-11-13 16:59:09 - INFO - [training_pipeline.py:520] - Preprocessing data...
+2025-11-13 16:59:10 - INFO - [training_pipeline.py:536] - Preprocessed 1000 meters
+2025-11-13 16:59:10 - INFO - [training_pipeline.py:540] - Loaded 30 transformers
+2025-11-13 16:59:10 - INFO - [training_pipeline.py:970] - ✓ Stage 'preprocess' completed in 0.60s
+2025-11-13 16:59:10 - INFO - [training_pipeline.py:372] - [Stage 3/6] Engineering features...
+2025-11-13 16:59:10 - INFO - [training_pipeline.py:560] - Engineering features...
+2025-11-13 16:59:11 - INFO - [training_pipeline.py:574] - Engineered 23 features for 1000 meters
+2025-11-13 16:59:11 - INFO - [training_pipeline.py:970] - ✓ Stage 'engineer_features' completed in 0.76s
+2025-11-13 16:59:11 - INFO - [training_pipeline.py:382] - [Stage 4/6] Training models...
+2025-11-13 16:59:11 - INFO - [training_pipeline.py:590] - Training models...
+2025-11-13 16:59:11 - INFO - [training_pipeline.py:699] - Feature selection summary:
+2025-11-13 16:59:11 - INFO - [training_pipeline.py:700] -   - Total columns: 23
+2025-11-13 16:59:11 - INFO - [training_pipeline.py:701] -   - Selected numeric features: 19
+2025-11-13 16:59:11 - INFO - [training_pipeline.py:702] -   - Excluded columns: 4
+2025-11-13 16:59:11 - INFO - [training_pipeline.py:708] -   - Excluded categorical: ['customer_class', 'barangay', 'meter_id', 'transformer_id']
+2025-11-13 16:59:11 - INFO - [training_pipeline.py:712] -   - Excluded identifiers: ['customer_class', 'barangay', 'meter_id', 'transformer_id']
+2025-11-13 16:59:11 - INFO - [training_pipeline.py:623] - Training with 1000 samples, 19 features
+2025-11-13 16:59:11 - INFO - [training_pipeline.py:631] - Model trained: Isolation Forest
+2025-11-13 16:59:11 - INFO - [training_pipeline.py:632] - Training time: 0.27s
+2025-11-13 16:59:11 - INFO - [training_pipeline.py:970] - ✓ Stage 'train_models' completed in 0.29s
+2025-11-13 16:59:11 - INFO - [training_pipeline.py:391] - [Stage 5/6] Evaluating models...
+2025-11-13 16:59:11 - INFO - [training_pipeline.py:752] - Evaluating models...
+2025-11-13 16:59:11 - ERROR - [training_pipeline.py:976] - ✗ Stage 'evaluate_models' failed after 0.04s: 'numpy.ndarray' object has no attribute 'predictions'
+2025-11-13 16:59:11 - ERROR - [training_pipeline.py:449] - ✗ Pipeline failed after 1.78s: 'numpy.ndarray' object has no attribute 'predictions'
+2025-11-13 17:01:16 - INFO - [logger.py:410] - Logger 'machine_learning.utils.data_validator' configured (level=INFO, file=True, console=True)
+2025-11-13 17:01:16 - INFO - [logger.py:410] - Logger 'machine_learning.pipeline.training_pipeline' configured (level=INFO, file=True, console=True)
+2025-11-13 17:01:16 - INFO - [training_pipeline.py:304] - Loaded configuration from C:\Users\Ken Ira Talingting\Desktop\GhostLoadMapper-IDOL_Hackathon-\machine_learning\config\config.yaml
+2025-11-13 17:01:16 - INFO - [training_pipeline.py:324] - Initialized TrainingPipeline: dataset=C:\Users\Ken Ira Talingting\Desktop\GhostLoadMapper-IDOL_Hackathon-\machine_learning\datasets\development, output=C:\Users\Ken Ira Talingting\Desktop\GhostLoadMapper-IDOL_Hackathon-\output
+2025-11-13 17:01:16 - INFO - [training_pipeline.py:348] - ================================================================================
+2025-11-13 17:01:16 - INFO - [training_pipeline.py:349] - Starting GhostLoad Mapper Training Pipeline
+2025-11-13 17:01:16 - INFO - [training_pipeline.py:350] - ================================================================================
+2025-11-13 17:01:16 - INFO - [training_pipeline.py:355] - [Stage 1/6] Loading data...
+2025-11-13 17:01:16 - INFO - [training_pipeline.py:468] - Loading data from C:\Users\Ken Ira Talingting\Desktop\GhostLoadMapper-IDOL_Hackathon-\machine_learning\datasets\development
+2025-11-13 17:01:16 - INFO - [training_pipeline.py:482] - Loaded 1000 meters
+2025-11-13 17:01:16 - INFO - [training_pipeline.py:489] - Loaded 30 transformers
+2025-11-13 17:01:16 - INFO - [data_validator.py:581] - DataValidator initialized
+2025-11-13 17:01:16 - INFO - [data_validator.py:615] - Validating meter data: 1000 rows, 19 columns
+2025-11-13 17:01:16 - INFO - [data_validator.py:678] - Meter data validation PASSED: 1000 rows validated successfully
+2025-11-13 17:01:16 - INFO - [training_pipeline.py:970] - ✓ Stage 'load_data' completed in 0.03s
+2025-11-13 17:01:16 - INFO - [training_pipeline.py:362] - [Stage 2/6] Preprocessing data...
+2025-11-13 17:01:16 - INFO - [training_pipeline.py:520] - Preprocessing data...
+2025-11-13 17:01:17 - INFO - [training_pipeline.py:536] - Preprocessed 1000 meters
+2025-11-13 17:01:17 - INFO - [training_pipeline.py:540] - Loaded 30 transformers
+2025-11-13 17:01:17 - INFO - [training_pipeline.py:970] - ✓ Stage 'preprocess' completed in 0.56s
+2025-11-13 17:01:17 - INFO - [training_pipeline.py:372] - [Stage 3/6] Engineering features...
+2025-11-13 17:01:17 - INFO - [training_pipeline.py:560] - Engineering features...
+2025-11-13 17:01:17 - INFO - [training_pipeline.py:574] - Engineered 23 features for 1000 meters
+2025-11-13 17:01:17 - INFO - [training_pipeline.py:970] - ✓ Stage 'engineer_features' completed in 0.78s
+2025-11-13 17:01:17 - INFO - [training_pipeline.py:382] - [Stage 4/6] Training models...
+2025-11-13 17:01:17 - INFO - [training_pipeline.py:590] - Training models...
+2025-11-13 17:01:17 - INFO - [training_pipeline.py:699] - Feature selection summary:
+2025-11-13 17:01:17 - INFO - [training_pipeline.py:700] -   - Total columns: 23
+2025-11-13 17:01:17 - INFO - [training_pipeline.py:701] -   - Selected numeric features: 19
+2025-11-13 17:01:17 - INFO - [training_pipeline.py:702] -   - Excluded columns: 4
+2025-11-13 17:01:17 - INFO - [training_pipeline.py:708] -   - Excluded categorical: ['meter_id', 'barangay', 'transformer_id', 'customer_class']
+2025-11-13 17:01:17 - INFO - [training_pipeline.py:712] -   - Excluded identifiers: ['meter_id', 'barangay', 'transformer_id', 'customer_class']
+2025-11-13 17:01:17 - INFO - [training_pipeline.py:623] - Training with 1000 samples, 19 features
+2025-11-13 17:01:17 - INFO - [training_pipeline.py:631] - Model trained: Isolation Forest
+2025-11-13 17:01:17 - INFO - [training_pipeline.py:632] - Training time: 0.19s
+2025-11-13 17:01:17 - INFO - [training_pipeline.py:970] - ✓ Stage 'train_models' completed in 0.21s
+2025-11-13 17:01:17 - INFO - [training_pipeline.py:391] - [Stage 5/6] Evaluating models...
+2025-11-13 17:01:17 - INFO - [training_pipeline.py:752] - Evaluating models...
+2025-11-13 17:01:18 - INFO - [training_pipeline.py:779] - Generated predictions for 1000 meters
+2025-11-13 17:01:18 - INFO - [training_pipeline.py:780] - Anomalies detected: 897 (89.7%)
+2025-11-13 17:01:18 - ERROR - [training_pipeline.py:976] - ✗ Stage 'evaluate_models' failed after 0.04s: AnomalyScorer.__init__() got an unexpected keyword argument 'isolation_weight'
+2025-11-13 17:01:18 - ERROR - [training_pipeline.py:449] - ✗ Pipeline failed after 1.63s: AnomalyScorer.__init__() got an unexpected keyword argument 'isolation_weight'
