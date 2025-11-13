@@ -1,0 +1,91 @@
+# GhostLoad Mapper - ML Pipeline Configuration
+# Version: 1.0.0
+# Last Updated: 2025-11-13
+
+# =============================================================================
+# FILE PATHS
+# =============================================================================
+file_paths:
+  # Directories
+  data_dir: "data"
+  output_dir: "output"
+  model_registry_dir: "models"
+  logs_dir: "logs"
+  temp_dir: "temp"
+  
+  # Data files
+  raw_data_file: "data/raw/meter_data.csv"
+  preprocessed_data_file: "data/processed/preprocessed.csv"
+  features_file: "data/processed/features.csv"
+  
+  # Model files
+  isolation_forest_model: "models/isolation_forest.pkl"
+  dbscan_model: "models/dbscan.pkl"
+  
+  # Output files
+  predictions_file: "output/predictions.csv"
+  risk_assessment_file: "output/risk_assessment.csv"
+  metrics_file: "output/metrics.json"
+
+# =============================================================================
+# MODEL PARAMETERS
+# =============================================================================
+model_parameters:
+  # IsolationForest for anomaly detection
+  isolation_forest:
+    contamination: 0.12       # Expected proportion of anomalies (12% - realistic theft rate)
+    n_estimators: 100         # Number of trees
+    max_samples: "auto"       # Samples per tree
+    max_features: 1.0         # Features per tree (100%)
+    random_state: 42          # Reproducibility
+    n_jobs: -1                # Use all cores
+  
+  # DBSCAN for spatial clustering
+  dbscan:
+    eps: 0.5                  # Maximum distance between neighbors
+    min_samples: 5            # Minimum cluster size
+    metric: "euclidean"       # Distance metric
+    algorithm: "auto"         # Algorithm selection
+    leaf_size: 30             # Leaf size for tree algorithms
+    n_jobs: -1                # Use all cores
+
+# =============================================================================
+# RISK THRESHOLDS
+# =============================================================================
+risk_thresholds:
+  high: 0.65                  # High-risk threshold (lowered from 0.8 for realistic detection)
+  medium: 0.45                # Medium-risk threshold (lowered from 0.6 for realistic detection)
+  extreme_low_ratio: 0.2      # Extreme low consumption ratio (<20% of median)
+  suspicious_low_ratio: 0.4   # Suspicious low consumption ratio (<40% of median)
+  spatial_boost: 0.15         # Risk boost for spatial anomalies
+
+# =============================================================================
+# FEATURE WEIGHTS
+# =============================================================================
+feature_weights:
+  isolation: 0.7              # IsolationForest score weight (70%)
+  ratio: 0.3                  # Consumption ratio weight (30%)
+  spatial: 0.0                # Spatial clustering weight (0% - optional)
+
+# =============================================================================
+# METRICS CONFIGURATION
+# =============================================================================
+metrics:
+  baseline_high_risk_rate: 0.20   # Expected high-risk rate (20%)
+  top_n_suspicious: 100           # Top N suspicious meters to report
+  confidence_threshold: 0.5       # Minimum acceptable confidence
+
+# =============================================================================
+# PIPELINE SETTINGS
+# =============================================================================
+enable_preprocessing: true        # Enable data preprocessing
+enable_feature_engineering: true  # Enable feature engineering
+enable_training: true             # Enable model training
+enable_evaluation: true           # Enable model evaluation
+
+# =============================================================================
+# EXECUTION SETTINGS
+# =============================================================================
+random_seed: 42                   # Global random seed
+n_jobs: -1                        # Number of parallel jobs (-1 = all cores)
+verbose: 1                        # Verbosity (0=silent, 1=info, 2=debug)

@@ -1,0 +1,875 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          121.09534835657075,
+          14.674131211903324
+        ]
+      },
+      "properties": {
+        "transformer_id": "TX_0001",
+        "feeder_id": "FD_02",
+        "barangay": "Rizal",
+        "capacity_kVA": 300.0,
+        "num_meters": 58,
+        "meter_ids": [
+          "MTR_000001",
+          "MTR_000002",
+          "MTR_000003",
+          "MTR_000004",
+          "MTR_000005",
+          "MTR_000006",
+          "MTR_000007",
+          "MTR_000008",
+          "MTR_000009",
+          "MTR_000010"
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          121.10639316623245,
+          14.626729463485265
+        ]
+      },
+      "properties": {
+        "transformer_id": "TX_0002",
+        "feeder_id": "FD_02",
+        "barangay": "Santa Cruz",
+        "capacity_kVA": 300.0,
+        "num_meters": 59,
+        "meter_ids": [
+          "MTR_000059",
+          "MTR_000060",
+          "MTR_000061",
+          "MTR_000062",
+          "MTR_000063",
+          "MTR_000064",
+          "MTR_000065",
+          "MTR_000066",
+          "MTR_000067",
+          "MTR_000068"
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          121.15946241289696,
+          14.612117145636077
+        ]
+      },
+      "properties": {
+        "transformer_id": "TX_0003",
+        "feeder_id": "FD_06",
+        "barangay": "Riverside",
+        "capacity_kVA": 100.0,
+        "num_meters": 19,
+        "meter_ids": [
+          "MTR_000118",
+          "MTR_000119",
+          "MTR_000120",
+          "MTR_000121",
+          "MTR_000122",
+          "MTR_000123",
+          "MTR_000124",
+          "MTR_000125",
+          "MTR_000126",
+          "MTR_000127"
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          121.1556675336006,
+          14.563220569625585
+        ]
+      },
+      "properties": {
+        "transformer_id": "TX_0004",
+        "feeder_id": "FD_10",
+        "barangay": "Del Pilar",
+        "capacity_kVA": 100.0,
+        "num_meters": 19,
+        "meter_ids": [
+          "MTR_000137",
+          "MTR_000138",
+          "MTR_000139",
+          "MTR_000140",
+          "MTR_000141",
+          "MTR_000142",
+          "MTR_000143",
+          "MTR_000144",
+          "MTR_000145",
+          "MTR_000146"
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          121.1534267569408,
+          14.554208453770348
+        ]
+      },
+      "properties": {
+        "transformer_id": "TX_0005",
+        "feeder_id": "FD_06",
+        "barangay": "Del Pilar",
+        "capacity_kVA": 300.0,
+        "num_meters": 58,
+        "meter_ids": [
+          "MTR_000156",
+          "MTR_000157",
+          "MTR_000158",
+          "MTR_000159",
+          "MTR_000160",
+          "MTR_000161",
+          "MTR_000162",
+          "MTR_000163",
+          "MTR_000164",
+          "MTR_000165"
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          121.15238909457042,
+          14.569479037659265
+        ]
+      },
+      "properties": {
+        "transformer_id": "TX_0006",
+        "feeder_id": "FD_08",
+        "barangay": "Del Pilar",
+        "capacity_kVA": 200.0,
+        "num_meters": 40,
+        "meter_ids": [
+          "MTR_000214",
+          "MTR_000215",
+          "MTR_000216",
+          "MTR_000217",
+          "MTR_000218",
+          "MTR_000219",
+          "MTR_000220",
+          "MTR_000221",
+          "MTR_000222",
+          "MTR_000223"
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          121.01728758334863,
+          14.621379981345564
+        ]
+      },
+      "properties": {
+        "transformer_id": "TX_0007",
+        "feeder_id": "FD_07",
+        "barangay": "Poblacion",
+        "capacity_kVA": 100.0,
+        "num_meters": 19,
+        "meter_ids": [
+          "MTR_000254",
+          "MTR_000255",
+          "MTR_000256",
+          "MTR_000257",
+          "MTR_000258",
+          "MTR_000259",
+          "MTR_000260",
+          "MTR_000261",
+          "MTR_000262",
+          "MTR_000263"
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          121.07215672882992,
+          14.60437850071978
+        ]
+      },
+      "properties": {
+        "transformer_id": "TX_0008",
+        "feeder_id": "FD_10",
+        "barangay": "San Isidro",
+        "capacity_kVA": 100.0,
+        "num_meters": 19,
+        "meter_ids": [
+          "MTR_000273",
+          "MTR_000274",
+          "MTR_000275",
+          "MTR_000276",
+          "MTR_000277",
+          "MTR_000278",
+          "MTR_000279",
+          "MTR_000280",
+          "MTR_000281",
+          "MTR_000282"
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          121.07533598074656,
+          14.655801796364942
+        ]
+      },
+      "properties": {
+        "transformer_id": "TX_0009",
+        "feeder_id": "FD_10",
+        "barangay": "Rizal",
+        "capacity_kVA": 150.0,
+        "num_meters": 29,
+        "meter_ids": [
+          "MTR_000292",
+          "MTR_000293",
+          "MTR_000294",
+          "MTR_000295",
+          "MTR_000296",
+          "MTR_000297",
+          "MTR_000298",
+          "MTR_000299",
+          "MTR_000300",
+          "MTR_000301"
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          121.00935246400611,
+          14.626281331837843
+        ]
+      },
+      "properties": {
+        "transformer_id": "TX_0010",
+        "feeder_id": "FD_07",
+        "barangay": "Poblacion",
+        "capacity_kVA": 100.0,
+        "num_meters": 20,
+        "meter_ids": [
+          "MTR_000321",
+          "MTR_000322",
+          "MTR_000323",
+          "MTR_000324",
+          "MTR_000325",
+          "MTR_000326",
+          "MTR_000327",
+          "MTR_000328",
+          "MTR_000329",
+          "MTR_000330"
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          121.10856497543465,
+          14.619128453963146
+        ]
+      },
+      "properties": {
+        "transformer_id": "TX_0011",
+        "feeder_id": "FD_03",
+        "barangay": "Santa Cruz",
+        "capacity_kVA": 150.0,
+        "num_meters": 30,
+        "meter_ids": [
+          "MTR_000341",
+          "MTR_000342",
+          "MTR_000343",
+          "MTR_000344",
+          "MTR_000345",
+          "MTR_000346",
+          "MTR_000347",
+          "MTR_000348",
+          "MTR_000349",
+          "MTR_000350"
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          121.18331656472463,
+          14.64179313745429
+        ]
+      },
+      "properties": {
+        "transformer_id": "TX_0012",
+        "feeder_id": "FD_04",
+        "barangay": "Riverside",
+        "capacity_kVA": 100.0,
+        "num_meters": 19,
+        "meter_ids": [
+          "MTR_000371",
+          "MTR_000372",
+          "MTR_000373",
+          "MTR_000374",
+          "MTR_000375",
+          "MTR_000376",
+          "MTR_000377",
+          "MTR_000378",
+          "MTR_000379",
+          "MTR_000380"
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          121.0229835482075,
+          14.43846665516899
+        ]
+      },
+      "properties": {
+        "transformer_id": "TX_0013",
+        "feeder_id": "FD_04",
+        "barangay": "Mabini",
+        "capacity_kVA": 300.0,
+        "num_meters": 58,
+        "meter_ids": [
+          "MTR_000390",
+          "MTR_000391",
+          "MTR_000392",
+          "MTR_000393",
+          "MTR_000394",
+          "MTR_000395",
+          "MTR_000396",
+          "MTR_000397",
+          "MTR_000398",
+          "MTR_000399"
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          121.19429865771058,
+          14.644247747800888
+        ]
+      },
+      "properties": {
+        "transformer_id": "TX_0014",
+        "feeder_id": "FD_04",
+        "barangay": "Bagong Silang",
+        "capacity_kVA": 200.0,
+        "num_meters": 39,
+        "meter_ids": [
+          "MTR_000448",
+          "MTR_000449",
+          "MTR_000450",
+          "MTR_000451",
+          "MTR_000452",
+          "MTR_000453",
+          "MTR_000454",
+          "MTR_000455",
+          "MTR_000456",
+          "MTR_000457"
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          121.15989237935233,
+          14.581494280227766
+        ]
+      },
+      "properties": {
+        "transformer_id": "TX_0015",
+        "feeder_id": "FD_05",
+        "barangay": "Riverside",
+        "capacity_kVA": 100.0,
+        "num_meters": 19,
+        "meter_ids": [
+          "MTR_000487",
+          "MTR_000488",
+          "MTR_000489",
+          "MTR_000490",
+          "MTR_000491",
+          "MTR_000492",
+          "MTR_000493",
+          "MTR_000494",
+          "MTR_000495",
+          "MTR_000496"
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          121.15543299191,
+          14.584518403896814
+        ]
+      },
+      "properties": {
+        "transformer_id": "TX_0016",
+        "feeder_id": "FD_01",
+        "barangay": "Riverside",
+        "capacity_kVA": 200.0,
+        "num_meters": 39,
+        "meter_ids": [
+          "MTR_000506",
+          "MTR_000507",
+          "MTR_000508",
+          "MTR_000509",
+          "MTR_000510",
+          "MTR_000511",
+          "MTR_000512",
+          "MTR_000513",
+          "MTR_000514",
+          "MTR_000515"
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          121.07871431725316,
+          14.639777121533855
+        ]
+      },
+      "properties": {
+        "transformer_id": "TX_0017",
+        "feeder_id": "FD_03",
+        "barangay": "Rizal",
+        "capacity_kVA": 200.0,
+        "num_meters": 39,
+        "meter_ids": [
+          "MTR_000545",
+          "MTR_000546",
+          "MTR_000547",
+          "MTR_000548",
+          "MTR_000549",
+          "MTR_000550",
+          "MTR_000551",
+          "MTR_000552",
+          "MTR_000553",
+          "MTR_000554"
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          121.19913473825295,
+          14.60831661390107
+        ]
+      },
+      "properties": {
+        "transformer_id": "TX_0018",
+        "feeder_id": "FD_06",
+        "barangay": "Riverside",
+        "capacity_kVA": 200.0,
+        "num_meters": 39,
+        "meter_ids": [
+          "MTR_000584",
+          "MTR_000585",
+          "MTR_000586",
+          "MTR_000587",
+          "MTR_000588",
+          "MTR_000589",
+          "MTR_000590",
+          "MTR_000591",
+          "MTR_000592",
+          "MTR_000593"
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          121.10276424820351,
+          14.645055086114402
+        ]
+      },
+      "properties": {
+        "transformer_id": "TX_0019",
+        "feeder_id": "FD_04",
+        "barangay": "Rizal",
+        "capacity_kVA": 50.0,
+        "num_meters": 10,
+        "meter_ids": [
+          "MTR_000623",
+          "MTR_000624",
+          "MTR_000625",
+          "MTR_000626",
+          "MTR_000627",
+          "MTR_000628",
+          "MTR_000629",
+          "MTR_000630",
+          "MTR_000631",
+          "MTR_000632"
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          121.09531433903649,
+          14.640340602955883
+        ]
+      },
+      "properties": {
+        "transformer_id": "TX_0020",
+        "feeder_id": "FD_02",
+        "barangay": "Rizal",
+        "capacity_kVA": 150.0,
+        "num_meters": 30,
+        "meter_ids": [
+          "MTR_000633",
+          "MTR_000634",
+          "MTR_000635",
+          "MTR_000636",
+          "MTR_000637",
+          "MTR_000638",
+          "MTR_000639",
+          "MTR_000640",
+          "MTR_000641",
+          "MTR_000642"
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          121.01509633927462,
+          14.57682894072875
+        ]
+      },
+      "properties": {
+        "transformer_id": "TX_0021",
+        "feeder_id": "FD_10",
+        "barangay": "Maligaya",
+        "capacity_kVA": 200.0,
+        "num_meters": 39,
+        "meter_ids": [
+          "MTR_000663",
+          "MTR_000664",
+          "MTR_000665",
+          "MTR_000666",
+          "MTR_000667",
+          "MTR_000668",
+          "MTR_000669",
+          "MTR_000670",
+          "MTR_000671",
+          "MTR_000672"
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          121.02907249163,
+          14.622323576494747
+        ]
+      },
+      "properties": {
+        "transformer_id": "TX_0022",
+        "feeder_id": "FD_10",
+        "barangay": "San Miguel",
+        "capacity_kVA": 150.0,
+        "num_meters": 29,
+        "meter_ids": [
+          "MTR_000702",
+          "MTR_000703",
+          "MTR_000704",
+          "MTR_000705",
+          "MTR_000706",
+          "MTR_000707",
+          "MTR_000708",
+          "MTR_000709",
+          "MTR_000710",
+          "MTR_000711"
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          121.0319368506582,
+          14.634976587321429
+        ]
+      },
+      "properties": {
+        "transformer_id": "TX_0023",
+        "feeder_id": "FD_08",
+        "barangay": "Poblacion",
+        "capacity_kVA": 150.0,
+        "num_meters": 30,
+        "meter_ids": [
+          "MTR_000731",
+          "MTR_000732",
+          "MTR_000733",
+          "MTR_000734",
+          "MTR_000735",
+          "MTR_000736",
+          "MTR_000737",
+          "MTR_000738",
+          "MTR_000739",
+          "MTR_000740"
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          121.01439267103412,
+          14.485570831464289
+        ]
+      },
+      "properties": {
+        "transformer_id": "TX_0024",
+        "feeder_id": "FD_05",
+        "barangay": "Mabini",
+        "capacity_kVA": 75.0,
+        "num_meters": 15,
+        "meter_ids": [
+          "MTR_000761",
+          "MTR_000762",
+          "MTR_000763",
+          "MTR_000764",
+          "MTR_000765",
+          "MTR_000766",
+          "MTR_000767",
+          "MTR_000768",
+          "MTR_000769",
+          "MTR_000770"
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          121.17555778247839,
+          14.674695565213549
+        ]
+      },
+      "properties": {
+        "transformer_id": "TX_0025",
+        "feeder_id": "FD_07",
+        "barangay": "Bagong Silang",
+        "capacity_kVA": 100.0,
+        "num_meters": 20,
+        "meter_ids": [
+          "MTR_000776",
+          "MTR_000777",
+          "MTR_000778",
+          "MTR_000779",
+          "MTR_000780",
+          "MTR_000781",
+          "MTR_000782",
+          "MTR_000783",
+          "MTR_000784",
+          "MTR_000785"
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          121.08203754557233,
+          14.660393624284977
+        ]
+      },
+      "properties": {
+        "transformer_id": "TX_0026",
+        "feeder_id": "FD_10",
+        "barangay": "Rizal",
+        "capacity_kVA": 150.0,
+        "num_meters": 30,
+        "meter_ids": [
+          "MTR_000796",
+          "MTR_000797",
+          "MTR_000798",
+          "MTR_000799",
+          "MTR_000800",
+          "MTR_000801",
+          "MTR_000802",
+          "MTR_000803",
+          "MTR_000804",
+          "MTR_000805"
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          121.0288089555841,
+          14.458138020731722
+        ]
+      },
+      "properties": {
+        "transformer_id": "TX_0027",
+        "feeder_id": "FD_04",
+        "barangay": "Mabini",
+        "capacity_kVA": 100.0,
+        "num_meters": 19,
+        "meter_ids": [
+          "MTR_000826",
+          "MTR_000827",
+          "MTR_000828",
+          "MTR_000829",
+          "MTR_000830",
+          "MTR_000831",
+          "MTR_000832",
+          "MTR_000833",
+          "MTR_000834",
+          "MTR_000835"
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          121.18061616180397,
+          14.651381899346344
+        ]
+      },
+      "properties": {
+        "transformer_id": "TX_0028",
+        "feeder_id": "FD_01",
+        "barangay": "Bagong Silang",
+        "capacity_kVA": 150.0,
+        "num_meters": 30,
+        "meter_ids": [
+          "MTR_000845",
+          "MTR_000846",
+          "MTR_000847",
+          "MTR_000848",
+          "MTR_000849",
+          "MTR_000850",
+          "MTR_000851",
+          "MTR_000852",
+          "MTR_000853",
+          "MTR_000854"
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          121.12499989578956,
+          14.614129203665374
+        ]
+      },
+      "properties": {
+        "transformer_id": "TX_0029",
+        "feeder_id": "FD_05",
+        "barangay": "Santa Cruz",
+        "capacity_kVA": 500.0,
+        "num_meters": 96,
+        "meter_ids": [
+          "MTR_000875",
+          "MTR_000876",
+          "MTR_000877",
+          "MTR_000878",
+          "MTR_000879",
+          "MTR_000880",
+          "MTR_000881",
+          "MTR_000882",
+          "MTR_000883",
+          "MTR_000884"
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          121.1775592917677,
+          14.62584624214307
+        ]
+      },
+      "properties": {
+        "transformer_id": "TX_0030",
+        "feeder_id": "FD_09",
+        "barangay": "Riverside",
+        "capacity_kVA": 150.0,
+        "num_meters": 30,
+        "meter_ids": [
+          "MTR_000971",
+          "MTR_000972",
+          "MTR_000973",
+          "MTR_000974",
+          "MTR_000975",
+          "MTR_000976",
+          "MTR_000977",
+          "MTR_000978",
+          "MTR_000979",
+          "MTR_000980"
+        ]
+      }
+    }
+  ]
+}

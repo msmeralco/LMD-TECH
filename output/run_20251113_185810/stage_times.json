@@ -1,0 +1,7 @@
+{
+  "load_data": 0.061570167541503906,
+  "preprocess": 0.710385799407959,
+  "engineer_features": 0.7567381858825684,
+  "train_models": 0.3759469985961914,
+  "evaluate_models": 0.03410983085632324
+}

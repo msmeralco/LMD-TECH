@@ -4,6 +4,6 @@ __pycache__/
 .env
 .env.local
 firebase-credentials.json
-ghost-load-mapper-firebase-adminsdk-*.json  # ← Add this line
+ghost-load-mapper-firebase-adminsdk-*.json 
 *.egg-info/
 .DS_Store

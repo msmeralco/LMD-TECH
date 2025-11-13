@@ -1,4 +1,8 @@
+<<<<<<< HEAD
 import React, { useState, useEffect } from 'react';
+=======
+import React, { useState, useEffect, useRef} from 'react';
+>>>>>>> c1022578e0fdcbaf999805988775970a0e861cfa
 import DistrictMapView from './DistrictMapView';
 import AnomalyMapper from './AnomalyMapper';
 import MeterList from './MeterList';

@@ -1,0 +1,2 @@
+{"timestamp": "2025-11-13T14:59:14.923547", "level": "INFO", "logger": "json_logger", "module": "logger", "function": "setup_logger", "line": 410, "message": "Logger 'json_logger' configured (level=INFO, file=True, console=False)", "thread": 20080, "thread_name": "MainThread", "process": 17176}
+{"timestamp": "2025-11-13T14:59:14.923547", "level": "INFO", "logger": "json_logger", "module": "logger", "function": "<module>", "line": 738, "message": "This will be logged in JSON format", "thread": 20080, "thread_name": "MainThread", "process": 17176}

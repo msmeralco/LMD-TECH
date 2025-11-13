@@ -1,0 +1,26 @@
+{
+  "model_id": "model_20251113_124457",
+  "created_at": "2025-11-13T12:44:57.850879",
+  "trained_at": "2025-11-13T12:44:57.889735",
+  "training_samples": 29,
+  "training_features": 2,
+  "training_time_seconds": 0.03309988975524902,
+  "feature_names": null,
+  "status": "trained",
+  "metrics": {},
+  "hyperparameters": {
+    "eps": 50.0,
+    "min_samples": 5,
+    "metric": "haversine",
+    "algorithm": "auto",
+    "small_cluster_threshold": 10,
+    "flag_noise_as_anomaly": true,
+    "flag_small_clusters": true
+  },
+  "environment": {
+    "python_version": "3.10.0 (tags/v3.10.0:b494f59, Oct  4 2021, 19:00:18) [MSC v.1929 64 bit (AMD64)]",
+    "platform": "Windows-10-10.0.26100-SP0",
+    "numpy_version": "1.24.3",
+    "pandas_version": "2.0.3"
+  }
+}

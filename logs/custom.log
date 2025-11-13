@@ -1,0 +1,2 @@
+2025-11-13 14:59:14 - INFO - [logger.py:410] - Logger 'custom_logger' configured (level=DEBUG, file=True, console=True)
+2025-11-13 14:59:14 - DEBUG - [logger.py:721] - Custom logger debug message
