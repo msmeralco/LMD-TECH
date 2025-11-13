@@ -8,6 +8,7 @@ interface RankingSidebarProps {
   onClose: () => void;
   onMeterClick: (meter: Meter) => void;
   runId: string | null;
+  selectedCity: string;
 }
 
 interface FilterOptions {
@@ -22,6 +23,7 @@ const RankingSidebar: React.FC<RankingSidebarProps> = ({
   onClose,
   onMeterClick,
   runId,
+  selectedCity,
 }) => {
   const [filterOptions, setFilterOptions] = useState<FilterOptions | null>(
     null
@@ -31,12 +33,14 @@ const RankingSidebar: React.FC<RankingSidebarProps> = ({
   const [selectedRiskLevel, setSelectedRiskLevel] = useState<string>("all");
   const [isExporting, setIsExporting] = useState(false);
 
-  // Load filter options
+  // Load filter options (filtered by selected city)
   useEffect(() => {
     if (runId) {
-      apiService.getFilterOptions(runId).then(setFilterOptions);
+      // Pass selectedCity to filter barangays by city
+      const cityId = selectedCity !== "ncr" ? selectedCity : undefined;
+      apiService.getFilterOptions(runId, cityId).then(setFilterOptions);
     }
-  }, [runId]);
+  }, [runId, selectedCity]);
 
   // Filter and rank meters
   const rankedMeters = useMemo(() => {
@@ -98,17 +102,14 @@ const RankingSidebar: React.FC<RankingSidebarProps> = ({
   return (
     <>
       {/* Overlay */}
-      <div
-        className="fixed inset-0 bg-black/30 backdrop-blur-sm z-[1100] animate-fadeIn"
-        onClick={onClose}
-      />
+      <div className="fixed inset-0 bg-black/20 z-[1100]" onClick={onClose} />
 
       {/* Sidebar */}
-      <div className="fixed right-0 top-0 bottom-0 w-[450px] bg-white shadow-2xl z-[1200] animate-slideInRight flex flex-col">
+      <div className="fixed right-0 top-0 bottom-0 w-[450px] bg-white shadow-lg z-[1200] flex flex-col">
         {/* Header */}
-        <div className="bg-gradient-to-r from-orange-500 to-orange-600 text-white p-6">
-          <div className="flex items-center justify-between mb-4">
-            <h2 className="text-2xl font-bold">📊 Meter Rankings</h2>
+        <div className="bg-orange-500 text-white p-5 border-b border-orange-600">
+          <div className="flex items-center justify-between mb-3">
+            <h2 className="text-xl font-semibold">Meter Rankings</h2>
             <button
               onClick={onClose}
               className="text-white/80 hover:text-white transition-colors"

@@ -2,7 +2,7 @@ import React, { useState, useMemo, useEffect } from "react";
 import {
   MapContainer,
   TileLayer,
-  Marker,
+  CircleMarker,
   Popup,
   Tooltip,
   useMap,
@@ -12,7 +12,6 @@ import LocationPins from "./LocationPins";
 import { Meter } from "../data/types";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
-import { CITY_METADATA, getCityFromBarangay } from "../data/cityMetadata";
 
 declare global {
   interface Window {
@@ -35,51 +34,6 @@ const NCR_BOUNDS: L.LatLngBoundsLiteral = [
   [14.35, 120.85],
   [14.85, 121.15],
 ];
-
-/**
- * Create custom city icon marker (NOT a circle)
- */
-const createCityIcon = (riskLevel: string, cityName: string) => {
-  const colors: Record<string, string> = {
-    high: "#EF4444",
-    medium: "#F59E0B",
-    low: "#10B981",
-    default: "#6B7280",
-  };
-
-  const color = colors[riskLevel] || colors.default;
-
-  return L.divIcon({
-    className: "custom-city-marker",
-    html: `
-      <div style="position: relative; width: 40px; height: 40px;">
-        <div style="
-          position: absolute;
-          top: 50%;
-          left: 50%;
-          transform: translate(-50%, -50%);
-          width: 32px;
-          height: 32px;
-          background: ${color};
-          border: 3px solid white;
-          border-radius: 8px;
-          box-shadow: 0 2px 8px rgba(0,0,0,0.3);
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          font-size: 16px;
-          font-weight: bold;
-          color: white;
-        ">
-          ${cityName.substring(0, 1).toUpperCase()}
-        </div>
-      </div>
-    `,
-    iconSize: [40, 40],
-    iconAnchor: [20, 20],
-    popupAnchor: [0, -20],
-  });
-};
 
 /**
  * Haversine distance calculation in meters
@@ -105,7 +59,7 @@ const calculateDistance = (
 };
 
 /**
- * Accurate cluster detection with configurable threshold
+ * Accurate cluster detection with 350m threshold
  */
 const hasHighRiskCluster = (
   meters: Meter[],
@@ -113,14 +67,7 @@ const hasHighRiskCluster = (
 ): boolean => {
   const highRiskMeters = meters.filter((m) => m.riskLevel === "high");
 
-  console.log(
-    `🔍 Cluster check: ${highRiskMeters.length} high-risk meters, threshold: ${maxDistance}m`
-  );
-
   if (highRiskMeters.length < 3) {
-    console.log(
-      `❌ Not enough high-risk meters (need 3+, have ${highRiskMeters.length})`
-    );
     return false;
   }
 
@@ -140,16 +87,10 @@ const hasHighRiskCluster = (
     }
 
     if (nearbyCount >= 2) {
-      console.log(
-        `✅ Cluster found: Meter ${i} has ${nearbyCount} neighbors within ${maxDistance}m`
-      );
       return true;
     }
   }
 
-  console.log(
-    `❌ No cluster: No meter has 2+ neighbors within ${maxDistance}m`
-  );
   return false;
 };
 
@@ -183,11 +124,11 @@ const HeatmapLayer: React.FC<{ meters: Meter[] }> = ({ meters }) => {
       );
 
       heatLayer = L.heatLayer(heatData, {
-        radius: 20, // Reduced from 25 - smaller radius prevents excessive spread
-        blur: 10, // Reduced from 15 - sharper boundaries
-        maxZoom: 15, // Critical fix: Heat stops scaling beyond zoom 15
-        minOpacity: 0.4, // More visible minimum
+        radius: 25,
+        blur: 15,
+        maxZoom: 17,
         max: 0.8,
+        minOpacity: 0.3,
         gradient: {
           0.0: "rgba(0, 0, 255, 0)",
           0.2: "rgba(0, 255, 255, 0.5)",
@@ -244,7 +185,7 @@ const DistrictMapView: React.FC<DistrictMapViewProps> = ({
   const [viewLevel, setViewLevel] = useState<ViewLevel>("ncr");
   const [selectedCity, setSelectedCity] = useState<string | null>(null);
 
-  // Group meters by city using metadata
+  // Extract unique cities from meters with their data
   const cities = useMemo(() => {
     const cityMap = new Map<
       string,
@@ -252,38 +193,38 @@ const DistrictMapView: React.FC<DistrictMapViewProps> = ({
     >();
 
     meters.forEach((meter) => {
-      // Get city from meter data
-      const cityId = (meter as any).city_id;
+      // Extract city from meter (assuming barangay contains city info or you have city field)
+      const city = (meter as any).city_id || "Unknown";
 
-      // Skip if city is unknown or not mapped
-      if (!cityId || cityId === "unknown") return;
-
-      // Get city metadata
-      const cityMetadata = CITY_METADATA[cityId];
-      if (!cityMetadata) return;
-
-      if (!cityMap.has(cityId)) {
-        cityMap.set(cityId, {
-          center: cityMetadata.center, // Use official city center
+      if (!cityMap.has(city)) {
+        cityMap.set(city, {
+          center: meter.position,
           meters: [],
           stats: { high: 0, medium: 0, low: 0 },
         });
       }
 
-      const cityData = cityMap.get(cityId)!;
+      const cityData = cityMap.get(city)!;
       cityData.meters.push(meter);
 
       if (meter.riskLevel === "high") cityData.stats.high++;
       else if (meter.riskLevel === "medium") cityData.stats.medium++;
       else cityData.stats.low++;
+
+      // Update center to average position
+      const avgLat =
+        cityData.meters.reduce((sum, m) => sum + m.position[0], 0) /
+        cityData.meters.length;
+      const avgLon =
+        cityData.meters.reduce((sum, m) => sum + m.position[1], 0) /
+        cityData.meters.length;
+      cityData.center = [avgLat, avgLon];
     });
 
-    return Array.from(cityMap.entries()).map(([id, data]) => ({
-      id,
-      name: CITY_METADATA[id]?.name || id,
-      center: data.center,
-      meters: data.meters,
-      stats: data.stats,
+    return Array.from(cityMap.entries()).map(([name, data]) => ({
+      id: name.toLowerCase(),
+      name: name.charAt(0).toUpperCase() + name.slice(1),
+      ...data,
     }));
   }, [meters]);
 
@@ -291,13 +232,9 @@ const DistrictMapView: React.FC<DistrictMapViewProps> = ({
     const city = cities.find((c) => c.id === cityId);
     if (!city) return;
 
-    // Use city metadata for zoom level
-    const cityMetadata = CITY_METADATA[cityId];
-    const zoom = cityMetadata?.zoom || 13;
-
     setSelectedCity(cityId);
     setMapCenter(city.center);
-    setMapZoom(zoom);
+    setMapZoom(13);
     setViewLevel("city");
     onDistrictClick(cityId);
   };
@@ -318,11 +255,9 @@ const DistrictMapView: React.FC<DistrictMapViewProps> = ({
 
   const showHeatmap = useMemo(() => {
     if (viewLevel !== "city" || !selectedCity) return false;
-    const result = hasHighRiskCluster(currentCityMeters, 500); // 500m = ~5-7 blocks, better for transformer service areas
+    const result = hasHighRiskCluster(currentCityMeters, 350);
     console.log(
-      result
-        ? "✅ Heatmap ON: Cluster detected (500m)"
-        : "❌ Heatmap OFF: No cluster within 500m"
+      result ? "✅ Heatmap ON: Cluster detected" : "❌ Heatmap OFF: No cluster"
     );
     return result;
   }, [viewLevel, selectedCity, currentCityMeters]);
@@ -383,80 +318,64 @@ const DistrictMapView: React.FC<DistrictMapViewProps> = ({
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
         />
 
-        {/* NCR View: Show city ICONS (not circles) */}
+        {/* NCR View: Show all city markers */}
         {viewLevel === "ncr" &&
-          cities.map((city) => {
-            const riskLevel =
-              city.stats.high > city.meters.length * 0.3
-                ? "high"
-                : city.stats.high > city.meters.length * 0.1
-                ? "medium"
-                : "low";
-
-            return (
-              <Marker
-                key={city.id}
-                position={city.center}
-                icon={createCityIcon(riskLevel, city.name)}
-                eventHandlers={{
-                  click: () => handleCityClick(city.id),
-                }}
-              >
-                <Tooltip
-                  direction="top"
-                  offset={[0, -25]}
-                  opacity={0.95}
-                  permanent={false}
-                >
-                  <div className="text-center px-2 py-1">
-                    <div className="font-semibold text-sm">{city.name}</div>
-                    <div className="text-xs text-gray-600">
-                      {city.meters.length} meters
+          cities.map((city) => (
+            <CircleMarker
+              key={city.id}
+              center={city.center}
+              radius={15}
+              pathOptions={{
+                fillColor: getRiskColor(city.stats),
+                fillOpacity: 0.7,
+                color: "#FFFFFF",
+                weight: 3,
+              }}
+              eventHandlers={{
+                click: () => handleCityClick(city.id),
+              }}
+            >
+              <Tooltip direction="top" offset={[0, -10]} opacity={0.9}>
+                <div className="text-center">
+                  <div className="font-bold text-sm">{city.name}</div>
+                  <div className="text-xs mt-1">
+                    {city.meters.length} meters
+                  </div>
+                </div>
+              </Tooltip>
+              <Popup>
+                <div className="p-3 min-w-[200px]">
+                  <h3 className="font-bold text-lg mb-3">{city.name}</h3>
+                  <div className="space-y-2 text-sm mb-3">
+                    <div className="flex justify-between">
+                      <span>Total Meters:</span>
+                      <span className="font-semibold">
+                        {city.meters.length}
+                      </span>
+                    </div>
+                    <div className="flex justify-between text-red-600">
+                      <span>High Risk:</span>
+                      <span className="font-semibold">{city.stats.high}</span>
+                    </div>
+                    <div className="flex justify-between text-yellow-600">
+                      <span>Medium Risk:</span>
+                      <span className="font-semibold">{city.stats.medium}</span>
+                    </div>
+                    <div className="flex justify-between text-green-600">
+                      <span>Low Risk:</span>
+                      <span className="font-semibold">{city.stats.low}</span>
                     </div>
                   </div>
-                </Tooltip>
-                <Popup>
-                  <div className="p-3 min-w-[220px]">
-                    <h3 className="font-bold text-lg mb-2 pb-2 border-b">
-                      {city.name}
-                    </h3>
-                    <div className="space-y-1.5 text-sm mb-3">
-                      <div className="flex justify-between">
-                        <span className="text-gray-600">Total Meters:</span>
-                        <span className="font-semibold">
-                          {city.meters.length}
-                        </span>
-                      </div>
-                      <div className="flex justify-between">
-                        <span className="text-red-600">High Risk:</span>
-                        <span className="font-semibold text-red-700">
-                          {city.stats.high}
-                        </span>
-                      </div>
-                      <div className="flex justify-between">
-                        <span className="text-yellow-600">Medium Risk:</span>
-                        <span className="font-semibold text-yellow-700">
-                          {city.stats.medium}
-                        </span>
-                      </div>
-                      <div className="flex justify-between">
-                        <span className="text-green-600">Low Risk:</span>
-                        <span className="font-semibold text-green-700">
-                          {city.stats.low}
-                        </span>
-                      </div>
-                    </div>
-                    <button
-                      onClick={() => handleCityClick(city.id)}
-                      className="w-full bg-orange-500 text-white px-4 py-2 rounded-md hover:bg-orange-600 transition-colors text-sm font-medium"
-                    >
-                      View Details
-                    </button>
-                  </div>
-                </Popup>
-              </Marker>
-            );
-          })}
+                  <button
+                    onClick={() => handleCityClick(city.id)}
+                    className="w-full bg-orange-500 text-white px-4 py-2 rounded-md hover:bg-orange-600 transition-colors text-sm font-medium"
+                  >
+                    View Details
+                  </button>
+                </div>
+              </Popup>
+            </CircleMarker>
+          ))}
 
         {/* City View: Show meters and heatmap */}
         {viewLevel === "city" && selectedCity && (

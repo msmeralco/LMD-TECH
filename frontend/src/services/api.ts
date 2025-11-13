@@ -179,12 +179,19 @@ class APIService {
   /**
    * Get available filter options for a run
    */
-  async getFilterOptions(runId: string): Promise<{
+  async getFilterOptions(
+    runId: string,
+    cityId?: string
+  ): Promise<{
     barangays: string[];
     transformers: string[];
     risk_levels: string[];
   }> {
-    const response = await fetch(`${API_BASE_URL}/api/filters/${runId}`);
+    const url = cityId 
+      ? `${API_BASE_URL}/api/filters/${runId}?city_id=${encodeURIComponent(cityId)}`
+      : `${API_BASE_URL}/api/filters/${runId}`;
+    
+    const response = await fetch(url);
 
     if (!response.ok) {
       throw new Error('Failed to fetch filter options');

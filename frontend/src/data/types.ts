@@ -9,6 +9,7 @@ export interface Meter {
   meterNumber: string;
   transformerId: string;
   barangay: string;
+  city_id: string; // ✅ CRITICAL: Required for city grouping in DistrictMapView
   feeder: string;
   riskLevel: 'high' | 'medium' | 'low';
   riskBand: string;
