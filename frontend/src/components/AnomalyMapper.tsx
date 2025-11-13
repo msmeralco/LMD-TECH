@@ -1,7 +1,7 @@
 import React, { useRef, useEffect } from 'react';
 import { Marker, Popup, useMap } from 'react-leaflet';
 import L from 'leaflet';
-import { Anomaly } from '../data/mockData';
+import { Anomaly } from '../data/types';
 
 interface AnomalyMapperProps {
   anomalies: Anomaly[];

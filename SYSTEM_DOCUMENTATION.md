@@ -86,12 +86,12 @@
 │        ├─ total_meters: 1500                                     │
 │        ├─ total_transformers: 120                                │
 │        ├─ high_risk_count: 75                                    │
-│        │                                                          │
+│        │                                                         │
 │        ├─ cities: [                                              │
 │        │     {city_id, city_name, lat, lon, total_transformers,  │
 │        │      high_risk_count}                                   │
-│        │   ]                                                      │
-│        │                                                          │
+│        │   ]                                                     │
+│        │                                                         │
 │        ├─ barangays: [                                           │
 │        │     {barangay, city_id, lat, lon, total_transformers,   │
 │        │      high_risk_count}                                   │

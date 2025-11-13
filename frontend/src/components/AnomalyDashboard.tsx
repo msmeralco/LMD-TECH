@@ -1,165 +1,233 @@
-<<<<<<< HEAD
 import React, { useState, useEffect } from 'react';
-=======
-import React, { useState, useEffect, useRef} from 'react';
->>>>>>> c1022578e0fdcbaf999805988775970a0e861cfa
 import DistrictMapView from './DistrictMapView';
-import AnomalyMapper from './AnomalyMapper';
 import MeterList from './MeterList';
 import DrilldownModal from './DrilldownModal';
-import LocationPins from './LocationPins';
-import { mockDistricts, mockAnomalies, mockMeters, Meter } from '../data/mockData';
+import FileUpload from './FileUpload';
+import { apiService, ResultsData, Meter as APIMeter } from '../services/api';
+import { Meter } from '../data/types';
 
-/**
- * Main Anomaly Dashboard Component
- * Orchestrates the district map, anomaly overlay, meter list, and drilldown modal
- */
 const AnomalyDashboard: React.FC = () => {
-  const [selectedDistrict, setSelectedDistrict] = useState<string | null>(null);
+  const [currentRunId, setCurrentRunId] = useState<string | null>(null);
+  const [resultsData, setResultsData] = useState<ResultsData | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const [selectedMeter, setSelectedMeter] = useState<Meter | null>(null);
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [isDataReady, setIsDataReady] = useState(false);
-  const [anomalies, setAnomalies] = useState(mockAnomalies);
-  const [meters, setMeters] = useState(mockMeters);
+  const [isMeterModalOpen, setIsMeterModalOpen] = useState(false);
+  const [selectedDistrict, setSelectedDistrict] = useState<string | null>(null);
 
-  // Handle district selection - triggers zoom and shows anomaly overlay
+  useEffect(() => {
+    if (currentRunId) {
+      loadResults(currentRunId);
+    }
+  }, [currentRunId]);
+
+  const loadResults = async (runId: string) => {
+    setIsLoading(true);
+    setError(null);
+    try {
+      const data = await apiService.getResults(runId);
+      setResultsData(data);
+    } catch (err: any) {
+      setError(err.message || 'Failed to load results');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleUploadSuccess = (runId: string) => {
+    setCurrentRunId(runId);
+  };
+
+  const handleResetView = () => {
+    setCurrentRunId(null);
+    setResultsData(null);
+    setSelectedMeter(null);
+    setIsMeterModalOpen(false);
+    setSelectedDistrict(null);
+  };
+
+  // Convert backend API meter to component Meter type
+  const convertAPIToMeter = (apiMeter: APIMeter): Meter => {
+    let riskLevel: 'high' | 'medium' | 'low' = 'low';
+    let riskBand = 'Low Risk';
+    
+    if (apiMeter.risk_level === 'HIGH') {
+      riskLevel = 'high';
+      riskBand = 'High Risk';
+    } else if (apiMeter.risk_level === 'MEDIUM') {
+      riskLevel = 'medium';
+      riskBand = 'Medium Risk';
+    }
+
+    // Convert consumption array to consumptionData format
+    const consumptionData = apiMeter.monthly_consumptions?.map((kwh, index) => ({
+      month: new Date(2024, index).toLocaleString('default', { month: 'short' }),
+      year: '2024',
+      kwh: kwh,
+      kva: kwh / 0.9, // Approximate kVA from kWh (assuming 0.9 power factor)
+    })) || [];
+
+    return {
+      id: apiMeter.meter_id,
+      meterNumber: apiMeter.meter_id,
+      transformerId: apiMeter.transformer_id,
+      barangay: apiMeter.barangay,
+      feeder: apiMeter.transformer_id,
+      riskLevel: riskLevel,
+      riskBand: riskBand,
+      anomalyScore: apiMeter.anomaly_score,
+      position: [apiMeter.lat, apiMeter.lon],
+      consumption: apiMeter.monthly_consumptions || [],
+      consumptionData: consumptionData, // ✅ Add this
+      anomalyNotes: riskLevel === 'high' 
+        ? `High anomaly score detected (${(apiMeter.anomaly_score * 100).toFixed(1)}%). Recommend field inspection.`
+        : undefined,
+    };
+  };
+
+  // Convert cities to districts for DistrictMapView
+  const getDistricts = () => {
+    if (!resultsData) return [];
+    
+    return resultsData.cities.map(city => ({
+      id: city.city_id,
+      name: city.city_name,
+      center: [city.lat, city.lon] as [number, number],
+      zoom: 13,
+      totalTransformers: city.total_transformers,
+      riskLevel: (city.high_risk_count > 5 ? 'high' : city.high_risk_count > 2 ? 'medium' : 'low') as 'high' | 'medium' | 'low',
+      totalMeters: resultsData.meters.filter(m => m.city_id === city.city_id).length,
+    }));
+  };
+
+  // Get meters for MeterList - REAL BACKEND DATA
+  const getMeters = (): Meter[] => {
+    if (!resultsData) return [];
+    return resultsData.meters.map(convertAPIToMeter);
+  };
+
+  // Handle meter click from map/list
+  const handleMeterClick = (meter: Meter) => {
+    console.log('🔍 Meter clicked:', meter.meterNumber); // Debug log
+    setSelectedMeter(meter);
+    setIsMeterModalOpen(true);
+  };
+
+  // Handle district click
   const handleDistrictClick = (districtId: string) => {
     setSelectedDistrict(districtId);
   };
 
-  // Handle meter selection - opens drilldown modal with auto data ready
-  const handleMeterClick = (meter: Meter) => {
-    setSelectedMeter(meter);
-    setIsDataReady(true); // Auto-enable data when pin is clicked
-    setIsModalOpen(true);
-  };
-
-  // Close modal handler
+  // Handle modal close
   const handleCloseModal = () => {
-    setIsModalOpen(false);
+    console.log('❌ Closing modal'); // Debug log
+    setIsMeterModalOpen(false);
     setSelectedMeter(null);
   };
-
-  // Reset view - clears district selection
-  const handleResetView = () => {
-    setSelectedDistrict(null);
-    setSelectedMeter(null);
-    setIsModalOpen(false);
-  };
-
-  // Graph Ready Button - simulates data fetching
-  const handleGraphReady = () => {
-    setIsDataReady(true);
-    // Simulate data refresh - in real app, this would fetch from API
-    setTimeout(() => {
-      setAnomalies([...mockAnomalies]);
-      setMeters([...mockMeters]);
-    }, 500);
-  };
-
-  // Filter anomalies and meters by selected district
-  const districtAnomalies = selectedDistrict
-    ? anomalies.filter(a => {
-        const district = mockDistricts.find(d => d.id === selectedDistrict);
-        // Simple proximity check - in real app, use proper boundary checking
-        return district && a.position;
-      })
-    : [];
-
-  const districtMeters = selectedDistrict
-    ? meters.filter(m => {
-        // Filter meters that belong to the selected district
-        // In real app, use proper district boundaries
-        return true; // For demo, show all meters
-      })
-    : [];
 
   return (
-    <div className="h-screen w-screen flex flex-col bg-white overflow-hidden">
+    <div className="h-screen flex flex-col bg-gray-50">
       {/* Header */}
-      <header className="bg-white border-b-2 border-meralco-orange shadow-sm z-50">
+      <header className="bg-white border-b-2 border-meralco-orange shadow-sm">
         <div className="px-6 py-4 flex justify-between items-center">
-          <div className="flex items-center">
-            <h1 className="text-2xl font-bold text-meralco-orange tracking-wide">
-              MERALCO
-            </h1>
-            <span className="ml-4 text-sm text-meralco-gray">Anomaly Detection Dashboard</span>
-          </div>
-          <div className="flex items-center gap-4">
-            <button
-              onClick={handleGraphReady}
-              className="px-4 py-2 bg-meralco-orange text-white rounded-md hover:bg-opacity-90 transition-colors font-medium"
-            >
-              Ready Graph Data
-            </button>
-            <button
-              onClick={handleResetView}
-              className="px-4 py-2 bg-white text-meralco-orange border border-meralco-orange rounded-md hover:bg-meralco-orange hover:bg-opacity-10 transition-colors font-medium"
-            >
-              Reset View
-            </button>
-          </div>
+          <h1 className="text-2xl font-bold text-meralco-orange">🔍 GhostLoad Mapper</h1>
+          {resultsData && (
+            <div className="flex items-center gap-3">
+              <span className="text-sm text-gray-600">
+                📊 {resultsData.total_meters} meters | ⚠️ {resultsData.high_risk_count} high-risk
+              </span>
+              <button
+                onClick={handleResetView}
+                className="px-4 py-2 bg-meralco-orange text-white rounded-md hover:bg-opacity-90 transition-colors"
+              >
+                Reset
+              </button>
+            </div>
+          )}
         </div>
       </header>
 
-      {/* Main Content Area */}
       <div className="flex-1 flex overflow-hidden">
-        {/* Map Section */}
-        <div className="flex-1 relative">
-          <DistrictMapView
-            districts={mockDistricts}
-            onDistrictClick={handleDistrictClick}
-            selectedDistrict={selectedDistrict}
-          >
-            {/* Location Pins - Always visible, shows all meter locations */}
-            <LocationPins
-              meters={meters}
-              onPinClick={handleMeterClick}
-            />
+        {/* Upload Section */}
+        {!resultsData && !isLoading && (
+          <div className="flex-1 p-6">
+            <FileUpload onUploadSuccess={handleUploadSuccess} />
             
-            {/* Anomaly Mapper Overlay - appears when district is selected */}
-            {selectedDistrict && (
-              <AnomalyMapper
-                anomalies={districtAnomalies}
-                onAnomalyClick={(anomaly: any) => {
-                  const meter = meters.find(m => m.id === anomaly.meterId);
-                  if (meter) handleMeterClick(meter);
-                }}
-              />
-            )}
-          </DistrictMapView>
-        </div>
-
-        {/* Sidebar - Meter List */}
-        {selectedDistrict && (
-          <div className="w-96 bg-white border-l border-meralco-light-gray shadow-lg overflow-hidden flex flex-col">
-            <div className="px-4 py-3 border-b border-meralco-light-gray bg-meralco-light-gray">
-              <h2 className="text-lg font-semibold text-meralco-black">Suspicious Meter List</h2>
-              <p className="text-xs text-meralco-gray mt-1">
-                {mockDistricts.find(d => d.id === selectedDistrict)?.name}
-              </p>
+            <div className="mt-6 bg-blue-50 border border-blue-200 rounded-lg p-4">
+              <h3 className="font-bold text-blue-900 mb-2">📋 How to use:</h3>
+              <ol className="text-sm text-blue-800 space-y-1 list-decimal list-inside">
+                <li>Upload your <code className="bg-blue-100 px-1 rounded">meter_consumption.csv</code> file</li>
+                <li>Backend will process data through ML pipeline</li>
+                <li>Explore map and filter suspicious meters</li>
+                <li>Click meters to see detailed analytics</li>
+              </ol>
             </div>
-            <MeterList
-              meters={districtMeters}
-              onMeterClick={handleMeterClick}
-              isDataReady={isDataReady}
-            />
+          </div>
+        )}
+
+        {/* Loading */}
+        {isLoading && (
+          <div className="flex-1 flex items-center justify-center">
+            <div className="text-center">
+              <svg className="animate-spin h-12 w-12 text-meralco-orange mx-auto mb-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+              </svg>
+              <p className="text-lg text-gray-600">Loading results...</p>
+            </div>
+          </div>
+        )}
+
+        {/* Error */}
+        {error && (
+          <div className="flex-1 p-6">
+            <div className="bg-red-50 border border-red-200 rounded-lg p-4 text-red-700">
+              <p className="font-semibold">Error loading results</p>
+              <p className="text-sm mt-1">{error}</p>
+            </div>
+          </div>
+        )}
+
+        {/* Main View - REAL BACKEND DATA */}
+        {resultsData && !isLoading && (
+          <div className="flex-1 flex">
+            {/* Map - 70% width */}
+            <div className="flex-1">
+              <DistrictMapView 
+                districts={getDistricts()}
+                onDistrictClick={handleDistrictClick}
+                selectedDistrict={selectedDistrict}
+                meters={getMeters()}
+                onMeterClick={handleMeterClick} // ✅ Pass handler
+              />
+            </div>
+
+            {/* Meter List - 30% width */}
+            <div className="w-96 border-l border-gray-200">
+              <MeterList 
+                meters={getMeters()}
+                onMeterClick={handleMeterClick}
+                isDataReady={true}
+              />
+            </div>
           </div>
         )}
       </div>
 
       {/* Drilldown Modal */}
-      {isModalOpen && selectedMeter && (
-        <DrilldownModal
-          meter={selectedMeter}
-          isOpen={isModalOpen}
-          onClose={handleCloseModal}
-          isDataReady={isDataReady}
-        />
+      {isMeterModalOpen && selectedMeter && (
+        <>
+          {console.log('🎨 Rendering modal for:', selectedMeter.meterNumber)}
+          <DrilldownModal
+            meter={selectedMeter}
+            isOpen={isMeterModalOpen}
+            onClose={handleCloseModal}
+            isDataReady={true}
+          />
+        </>
       )}
     </div>
   );
 };
 
 export default AnomalyDashboard;
-

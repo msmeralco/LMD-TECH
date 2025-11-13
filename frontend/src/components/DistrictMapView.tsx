@@ -1,204 +1,385 @@
-import React, { useRef, useImperativeHandle, forwardRef } from 'react';
-import { MapContainer, TileLayer, useMap, Marker } from 'react-leaflet';
+import React, { useState, useMemo, useEffect } from 'react';
+import { MapContainer, TileLayer, CircleMarker, Popup, useMap } from 'react-leaflet';
+import { District } from '../data/types';
+import LocationPins from './LocationPins';
+import { Meter } from '../data/types';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
-import DistrictPopup from './DistrictPopup';
 
-interface District {
-  id: string;
-  name: string;
-  center: [number, number];
-  zoom: number;
-  totalTransformers: number;
-  riskLevel: 'high' | 'medium' | 'low';
-  totalMeters: number;
+// ✅ Import heatmap - needs to be added to window.L
+declare global {
+  interface Window {
+    L: any;
+  }
 }
 
 interface DistrictMapViewProps {
   districts: District[];
   onDistrictClick: (districtId: string) => void;
   selectedDistrict: string | null;
-  children?: React.ReactNode;
+  meters?: Meter[];
+  onMeterClick?: (meter: Meter) => void;
 }
 
-const METRO_MANILA_CENTER: [number, number] = [14.6042, 121.0408];
-const INITIAL_ZOOM = 11;
+// ✅ NCR Center - Focus on Manila
+const NCR_CENTER: [number, number] = [14.5995, 121.0374];
+const INITIAL_ZOOM = 12;
 
-// Map Controller Component - handles zoom and pan
-const MapController = forwardRef<{ resetView: () => void }, { 
-  center: [number, number];
-  zoom: number;
-}>(({ center, zoom }, ref) => {
+// ✅ ONLY Manila City - since data only has Manila
+const MANILA_CITY = {
+  id: 'manila',
+  name: 'Manila',
+  center: [14.5995, 121.0374] as [number, number],
+};
+
+const NCR_BOUNDS: L.LatLngBoundsLiteral = [
+  [14.3800, 120.9200],
+  [14.7500, 121.1200],
+];
+
+// ✅ Heatmap Component
+const HeatmapLayer: React.FC<{ meters: Meter[] }> = ({ meters }) => {
+  const map = useMap();
+
+  useEffect(() => {
+    const loadHeatmap = async () => {
+      if (!window.L.heatLayer) {
+        // @ts-ignore
+        await import('leaflet.heat');
+      }
+
+      if (!meters || meters.length === 0) return;
+
+      const highRiskMeters = meters.filter(m => m.riskLevel === 'high');
+      
+      console.log('🔥 High risk meters for heatmap:', highRiskMeters.length);
+
+      if (highRiskMeters.length === 0) {
+        console.log('⚠️ No high-risk meters to display');
+        return;
+      }
+
+      const heatData = highRiskMeters.map(meter => [
+        meter.position[0],
+        meter.position[1],
+        meter.anomalyScore,
+      ]);
+
+      console.log('📊 Heatmap data points:', heatData.length);
+
+      // @ts-ignore
+      const heatLayer = L.heatLayer(heatData, {
+        radius: 30,
+        blur: 20,
+        maxZoom: 17,
+        max: 1.0,
+        minOpacity: 0.4,
+        gradient: {
+          0.0: 'blue',
+          0.2: 'lime',
+          0.4: 'yellow',
+          0.6: 'orange',
+          0.8: 'red',
+          1.0: 'darkred',
+        },
+      }).addTo(map);
+
+      console.log('✅ Heatmap layer added to map');
+
+      return () => {
+        console.log('🗑️ Removing heatmap layer');
+        map.removeLayer(heatLayer);
+      };
+    };
+
+    loadHeatmap();
+  }, [map, meters]);
+
+  return null;
+};
+
+// Map Controller
+const MapController: React.FC<{ center: [number, number]; zoom: number }> = ({ center, zoom }) => {
   const map = useMap();
 
   React.useEffect(() => {
     map.flyTo(center, zoom, {
-      animate: true,
-      duration: 1.0,
+      duration: 1.2,
+      easeLinearity: 0.25,
     });
-  }, [map, center, zoom]);
-
-  useImperativeHandle(ref, () => ({
-    resetView: () => {
-      map.flyTo(METRO_MANILA_CENTER, INITIAL_ZOOM, {
-        animate: true,
-        duration: 1.0,
-      });
-    },
-  }));
+  }, [center, zoom, map]);
 
   return null;
-});
-
-MapController.displayName = 'MapController';
-
-// District Marker Component - clickable district boundaries
-interface DistrictMarkerProps {
-  district: District;
-  isSelected: boolean;
-  onClick: () => void;
-}
-
-// District Marker Component - popup only opens on click
-const DistrictMarker: React.FC<DistrictMarkerProps> = ({ district, isSelected, onClick }) => {
-  const map = useMap();
-  const markerRef = useRef<L.Marker | null>(null);
-
-  const handleClick = () => {
-    // Smooth zoom to district
-    map.flyTo(district.center, district.zoom, {
-      animate: true,
-      duration: 1.0,
-    });
-    onClick();
-    // Open popup after zoom animation completes
-    setTimeout(() => {
-      if (markerRef.current) {
-        markerRef.current.openPopup();
-      }
-    }, 1000);
-  };
-
-  // Create custom icon for district
-  const districtIcon = L.divIcon({
-    className: 'district-marker',
-    html: `
-      <div style="
-        width: ${isSelected ? '50px' : '40px'};
-        height: ${isSelected ? '50px' : '40px'};
-        border-radius: 50%;
-        background-color: ${isSelected ? '#FF6F00' : '#666666'};
-        opacity: ${isSelected ? '0.3' : '0.2'};
-        border: ${isSelected ? '3px' : '2px'} solid ${isSelected ? '#FF6F00' : '#666666'};
-        cursor: pointer;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        transition: all 0.3s ease;
-      ">
-        <div style="
-          width: 10px;
-          height: 10px;
-          border-radius: 50%;
-          background-color: ${isSelected ? '#FF6F00' : '#666666'};
-        "></div>
-      </div>
-    `,
-    iconSize: [isSelected ? 50 : 40, isSelected ? 50 : 40],
-    iconAnchor: [isSelected ? 25 : 20, isSelected ? 25 : 20],
-  });
-
-  return (
-    <Marker
-      position={district.center}
-      icon={districtIcon}
-      ref={markerRef}
-      eventHandlers={{
-        click: handleClick,
-      }}
-    >
-      <DistrictPopup district={district} />
-    </Marker>
-  );
 };
 
-/**
- * District Map View Component
- * Displays clickable district boundaries that zoom in when clicked
- */
+type ViewLevel = 'city' | 'barangay';
+
+interface ViewState {
+  level: ViewLevel;
+}
+
 const DistrictMapView: React.FC<DistrictMapViewProps> = ({
   districts,
   onDistrictClick,
   selectedDistrict,
-  children,
+  meters = [],
+  onMeterClick,
 }) => {
-  const mapControllerRef = useRef<{ resetView: () => void }>(null);
-  const [mapCenter, setMapCenter] = React.useState<[number, number]>(METRO_MANILA_CENTER);
-  const [mapZoom, setMapZoom] = React.useState(INITIAL_ZOOM);
+  const [mapCenter, setMapCenter] = useState<[number, number]>(NCR_CENTER);
+  const [mapZoom, setMapZoom] = useState(INITIAL_ZOOM);
+  const [viewState, setViewState] = useState<ViewState>({
+    level: 'city', // ✅ Start at city level - show Manila
+  });
 
-  // Update map view when district is selected
-  React.useEffect(() => {
-    if (selectedDistrict) {
-      const district = districts.find(d => d.id === selectedDistrict);
-      if (district) {
-        setMapCenter(district.center);
-        setMapZoom(district.zoom);
-      }
-    } else {
-      setMapCenter(METRO_MANILA_CENTER);
-      setMapZoom(INITIAL_ZOOM);
+  const getRiskColor = (riskLevel: 'high' | 'medium' | 'low') => {
+    switch (riskLevel) {
+      case 'high': return '#FF6F00';
+      case 'medium': return '#FFA500';
+      case 'low': return '#90EE90';
+      default: return '#CCCCCC';
     }
-  }, [selectedDistrict, districts]);
+  };
+
+  // ✅ Calculate Manila stats
+  const getManilaStats = () => {
+    const highRiskCount = meters.filter(m => m.riskLevel === 'high').length;
+    const mediumRiskCount = meters.filter(m => m.riskLevel === 'medium').length;
+    const lowRiskCount = meters.filter(m => m.riskLevel === 'low').length;
+    
+    const riskLevel: 'high' | 'medium' | 'low' = 
+      highRiskCount > meters.length * 0.3 ? 'high' :
+      highRiskCount > meters.length * 0.1 ? 'medium' : 'low';
+
+    return {
+      totalMeters: meters.length,
+      highRisk: highRiskCount,
+      mediumRisk: mediumRiskCount,
+      lowRisk: lowRiskCount,
+      riskLevel,
+    };
+  };
+
+  // ✅ Click Manila - Zoom into barangays
+  const handleManilaClick = () => {
+    setMapCenter(MANILA_CITY.center);
+    setMapZoom(14); // Zoom closer to show barangays
+    setViewState({
+      level: 'barangay',
+    });
+    onDistrictClick('manila');
+  };
+
+  // ✅ Reset to city view
+  const handleResetView = () => {
+    setMapCenter(NCR_CENTER);
+    setMapZoom(INITIAL_ZOOM);
+    setViewState({
+      level: 'city',
+    });
+    onDistrictClick('');
+  };
+
+  // ✅ Check if heatmap should be shown
+  const showHeatmap = useMemo(() => {
+    if (viewState.level !== 'barangay') return false; // Only show heatmap at barangay level
+
+    const highRiskMeters = meters.filter(m => m.riskLevel === 'high');
+    const shouldShow = highRiskMeters.length >= 3;
+    console.log(`🔥 Heatmap decision: ${highRiskMeters.length} high-risk meters, showing: ${shouldShow}`);
+    return shouldShow;
+  }, [meters, viewState]);
+
+  const stats = getManilaStats();
 
   return (
-    <div className="h-full w-full relative">
+    <div className="relative h-full w-full">
+      {/* Back Button */}
+      {viewState.level === 'barangay' && (
+        <button
+          onClick={handleResetView}
+          className="absolute top-4 left-4 z-[1000] bg-white px-4 py-2 rounded-lg shadow-lg hover:bg-gray-100 hover:shadow-xl transition-all duration-300 flex items-center gap-2 animate-fadeIn"
+        >
+          ← Back to Manila City
+        </button>
+      )}
+
+      {/* View Level Indicator */}
+      <div className="absolute top-4 left-1/2 transform -translate-x-1/2 z-[1000] bg-white px-4 py-2 rounded-lg shadow-lg">
+        <p className="text-sm font-medium text-gray-700">
+          {viewState.level === 'city' && '🏙️ Manila City'}
+          {viewState.level === 'barangay' && '📍 Manila - Barangay View'}
+          {showHeatmap && ' • 🔥 High Risk Heatmap Active'}
+        </p>
+      </div>
+
       <MapContainer
-        center={mapCenter}
-        zoom={mapZoom}
+        center={NCR_CENTER}
+        zoom={INITIAL_ZOOM}
         style={{ height: '100%', width: '100%' }}
         zoomControl={true}
+        maxBounds={NCR_BOUNDS}
+        maxBoundsViscosity={1.0}
+        minZoom={12}
+        maxZoom={18}
         scrollWheelZoom={true}
-        className="z-0"
+        doubleClickZoom={true}
+        dragging={true}
+        zoomAnimation={true}
+        fadeAnimation={true}
+        markerZoomAnimation={true}
       >
+        <MapController center={mapCenter} zoom={mapZoom} />
+        
         <TileLayer
-          attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+          attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+          updateWhenIdle={false}
+          keepBuffer={4}
         />
-        <MapController ref={mapControllerRef} center={mapCenter} zoom={mapZoom} />
-        
-        {/* Render district markers */}
-        {districts.map((district) => (
-          <DistrictMarker
-            key={district.id}
-            district={district}
-            isSelected={selectedDistrict === district.id}
-            onClick={() => onDistrictClick(district.id)}
-          />
-        ))}
-        
-        {/* Render children components (like LocationPins) */}
-        {children}
+
+        {/* LEVEL 1: Show Manila City Pin */}
+        {viewState.level === 'city' && (
+          <CircleMarker
+            center={MANILA_CITY.center}
+            radius={50} // Large pin for Manila
+            pathOptions={{
+              fillColor: getRiskColor(stats.riskLevel),
+              fillOpacity: 0.6,
+              color: '#FFFFFF',
+              weight: 4,
+            }}
+            eventHandlers={{
+              click: handleManilaClick,
+            }}
+          >
+            <Popup>
+              <div className="p-4 min-w-[250px]">
+                <h3 className="font-bold text-2xl text-meralco-black mb-3">Manila City</h3>
+                <div className="space-y-2 text-sm mb-4">
+                  <p className="flex justify-between">
+                    <strong>Total Meters:</strong> 
+                    <span className="font-semibold">{stats.totalMeters}</span>
+                  </p>
+                  <p className="flex justify-between">
+                    <strong className="text-red-600">High Risk:</strong> 
+                    <span className="font-semibold text-red-600">{stats.highRisk}</span>
+                  </p>
+                  <p className="flex justify-between">
+                    <strong className="text-yellow-600">Medium Risk:</strong> 
+                    <span className="font-semibold text-yellow-600">{stats.mediumRisk}</span>
+                  </p>
+                  <p className="flex justify-between">
+                    <strong className="text-green-600">Low Risk:</strong> 
+                    <span className="font-semibold text-green-600">{stats.lowRisk}</span>
+                  </p>
+                  <hr className="my-2" />
+                  <p className="flex justify-between">
+                    <strong>Overall Risk:</strong> 
+                    <span className={`font-bold ${
+                      stats.riskLevel === 'high' ? 'text-red-600' :
+                      stats.riskLevel === 'medium' ? 'text-yellow-600' : 'text-green-600'
+                    }`}>{stats.riskLevel.toUpperCase()}</span>
+                  </p>
+                </div>
+                <button
+                  onClick={handleManilaClick}
+                  className="w-full bg-meralco-orange text-white px-4 py-3 rounded-lg hover:bg-opacity-90 transition-all font-medium shadow-md"
+                >
+                  View Barangays →
+                </button>
+              </div>
+            </Popup>
+          </CircleMarker>
+        )}
+
+        {/* LEVEL 2: Show Barangay Meters + Heatmap */}
+        {viewState.level === 'barangay' && (
+          <>
+            {/* ✅ Heatmap shows if high-risk meters exist */}
+            {showHeatmap && (
+              <>
+                {console.log('🔥 Rendering heatmap component')}
+                <HeatmapLayer meters={meters} />
+              </>
+            )}
+            
+            {/* Individual meter pins */}
+            {meters.length > 0 && onMeterClick && (
+              <div className="animate-fadeIn">
+                <LocationPins 
+                  meters={meters} 
+                  onPinClick={onMeterClick}
+                />
+              </div>
+            )}
+          </>
+        )}
       </MapContainer>
 
-      {/* District Labels Overlay */}
-      <div className="absolute top-4 left-4 z-[1000] bg-white bg-opacity-90 rounded-lg shadow-lg p-3">
-        <h3 className="text-sm font-semibold text-meralco-black mb-2">Districts</h3>
-        <div className="space-y-1">
-          {districts.map((district) => (
-            <button
-              key={district.id}
-              onClick={() => onDistrictClick(district.id)}
-              className={`block w-full text-left px-2 py-1 rounded text-xs transition-colors ${
-                selectedDistrict === district.id
-                  ? 'bg-meralco-orange text-white'
-                  : 'hover:bg-meralco-light-gray text-meralco-black'
-              }`}
-            >
-              {district.name}
-            </button>
-          ))}
+      {/* Info Panel */}
+      <div className="absolute bottom-4 right-4 bg-white p-4 rounded-lg shadow-lg hover:shadow-xl z-[1000] max-w-xs transition-all duration-300">
+        <h4 className="font-bold text-sm mb-2">
+          {viewState.level === 'city' ? '🗺️ Manila City' : '📍 Manila Barangays'}
+        </h4>
+        
+        {viewState.level === 'city' && (
+          <p className="text-xs text-gray-600 mb-3">
+            Capital of the Philippines
+          </p>
+        )}
+
+        <div className="space-y-1 text-xs mb-3">
+          <div className="flex items-center justify-between gap-2">
+            <div className="flex items-center gap-2">
+              <div className="w-4 h-4 rounded-full" style={{ backgroundColor: '#FF6F00' }}></div>
+              <span>High Risk</span>
+            </div>
+            <span className="font-semibold">{stats.highRisk}</span>
+          </div>
+          <div className="flex items-center justify-between gap-2">
+            <div className="flex items-center gap-2">
+              <div className="w-4 h-4 rounded-full" style={{ backgroundColor: '#FFA500' }}></div>
+              <span>Medium Risk</span>
+            </div>
+            <span className="font-semibold">{stats.mediumRisk}</span>
+          </div>
+          <div className="flex items-center justify-between gap-2">
+            <div className="flex items-center gap-2">
+              <div className="w-4 h-4 rounded-full" style={{ backgroundColor: '#90EE90' }}></div>
+              <span>Low Risk</span>
+            </div>
+            <span className="font-semibold">{stats.lowRisk}</span>
+          </div>
         </div>
+
+        <div className="pt-3 border-t border-gray-200">
+          <p className="text-xs text-gray-600 font-medium">
+            📍 Total Meters: <span className="font-bold text-meralco-black">{stats.totalMeters}</span>
+          </p>
+          {viewState.level === 'barangay' && showHeatmap && (
+            <p className="text-xs text-orange-600 mt-2">
+              🔥 Heatmap: {stats.highRisk} high-risk clusters detected
+            </p>
+          )}
+        </div>
+
+        {viewState.level === 'city' && (
+          <p className="mt-3 pt-3 border-t border-gray-200 text-xs text-gray-500 italic">
+            Click Manila to view barangays
+          </p>
+        )}
       </div>
+
+      {/* CSS */}
+      <style>{`
+        @keyframes fadeIn {
+          from { opacity: 0; transform: translateY(10px); }
+          to { opacity: 1; transform: translateY(0); }
+        }
+        .animate-fadeIn {
+          animation: fadeIn 0.5s ease-out forwards;
+        }
+      `}</style>
     </div>
   );
 };

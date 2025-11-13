@@ -1,6 +1,6 @@
 import React from 'react';
 import { Popup } from 'react-leaflet';
-import { District } from '../data/mockData';
+import { District } from '../data/types';
 
 interface DistrictPopupProps {
   district: District;

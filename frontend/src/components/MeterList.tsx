@@ -1,6 +1,6 @@
 import React, { useState, useMemo } from 'react';
-import { Meter } from '../data/mockData';
-import { getUniqueBarangays, getUniqueFeeders, getUniqueRiskBands } from '../data/mockData';
+import { Meter } from '../data/types';
+import { getUniqueBarangays, getUniqueFeeders, getUniqueRiskBands } from '../data/types';
 
 interface MeterListProps {
   meters: Meter[];
